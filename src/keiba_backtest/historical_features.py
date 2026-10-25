@@ -200,7 +200,7 @@ def build_features(dataset: dict[str, Any], *, allow_unverified: bool = False,
         seen_horses, seen_numbers = set(), set()
         excluded = []
         runner_outputs = []
-        has_unverified = snap_kind == "retrospective_unverified"
+        has_unverified = snap_kind == "retrospective_unverified" or kind == "retrospective_research"
         for j, entry_raw in enumerate(race["entries"]):
             entry = _object(entry_raw, f"{race_id}/entries[{j}]")
             _required_keys(entry,

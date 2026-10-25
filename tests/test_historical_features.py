@@ -133,6 +133,21 @@ class TestHistoricalFeatures(unittest.TestCase):
         self.assertEqual(result["quality"], "RETROSPECTIVE_UNVERIFIED_NOT_EMPIRICAL")
         self.assertTrue(all(r["quality"] == "RETROSPECTIVE_UNVERIFIED_NOT_EMPIRICAL" for r in result["races"]))
 
+    def test_research_dataset_cannot_report_verified_race_quality(self):
+        data = self.clone()
+        data["dataset_kind"] = "retrospective_research"
+        for race in data["races"]:
+            race["snapshot"]["kind"] = "captured_pre_race"
+            race["snapshot"]["source_sha256"] = "b" * 64
+            for runner in race["entries"]:
+                for s in runner["past_starts"]:
+                    s["evidence"]["kind"] = "captured_pre_race"
+                    s["evidence"]["source_sha256"] = "b" * 64
+        out = build_features(data)
+        self.assertFalse(out["empirical_backtest_eligible"])
+        self.assertTrue(all(r["quality"] == "RETROSPECTIVE_UNVERIFIED_NOT_EMPIRICAL"
+                            for r in out["races"]))
+
     def test_archive_cannot_contain_synthetic_or_retro(self):
         data = self.clone()
         data["dataset_kind"] = "historical_archive"
