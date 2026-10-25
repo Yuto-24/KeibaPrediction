@@ -8,6 +8,7 @@ from .probability import model_probabilities, scenario_subset
 from .scoring import score_forecast, loss
 from .temporal import walk_forward
 from .diagnostics import reliability_bins, race_bootstrap_loss_difference, summarize_walk_forward
+from .historical_features import build_from_file
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -43,8 +44,15 @@ def main(argv: list[str] | None = None) -> None:
     walk.add_argument("--outcomes",required=True,help="Folder containing official outcome JSONs")
     walk.add_argument("--min-train-races",type=int,default=30)
     walk.add_argument("--output")
+    hist=sub.add_parser("historical-features", help="Build audited pre-race features from a supplied JSON source bundle")
+    hist.add_argument("--input",required=True,help="Historical bundle JSON; no automatic scraping")
+    hist.add_argument("--output",help="Feature JSON output")
+    hist.add_argument("--allow-unverified",action="store_true",help="Retrospective sources: diagnostic only, never backtest eligible")
     args=parser.parse_args(argv)
-    if args.command=="validate":
+    if args.command=="historical-features":
+        result=build_from_file(args.input,allow_unverified=args.allow_unverified)
+        _emit(result,args.output)
+    elif args.command=="validate":
         f=load_json(args.forecast)
         validate_forecast(f)
         if args.outcome:

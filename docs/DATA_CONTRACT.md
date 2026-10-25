@@ -32,3 +32,7 @@ For comparison, `market_probabilities` normalizes `1/decimal_odds` across the fi
 - Rolling calibration is fitted to previous **paired forecast + final outcome** records only. Outcome's `result_usable_after <= next_forecast.asof` is checked.
 - Bin summaries are descriptive; individual horses in the same race are not independent samples. Bootstrap resamples races, not horses.
 - If the sample is smaller than the configured initial threshold of 30 races, calibration and significance checks are skipped without adding artificial data.
+
+## Historical feature input / output (v1, Issue #1)
+
+See `docs/HISTORICAL_FEATURES.md` for the complete historical import contract and sample fixture. It uses its own CLI (`historical-features`), not the v0.1 `data/forecasts/` probability schema. `historical_archive` requires contemporaneous capture of full entrant rosters and prior race facts. `retrospective_research` and `synthetic_fixture` never become empirical validation samples, even when they generate plausible numerical features. Historic features must not contain target-race labels.

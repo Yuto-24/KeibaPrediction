@@ -7,3 +7,12 @@
 - 2025 official race result: https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2025.html
 
 The 2023–25 files contain only verified top-three result labels. They are not archived forecasts. No as-of market odds have been collected. The 2026 official result snapshot includes an outcome availability *policy cutoff* of the next day at 00:00 JST, not a claimed timestamp when JRA first published results.
+
+## Issue #1: source-permission review (2026-10-25)
+
+- JRA website: https://www.jra.go.jp/use/index.html — official race facts and source links are useful, but JRA explicitly reserves rights to its authored articles/media. **No automated extraction or broad raw-data redistribution is enabled here.**
+- JRA-VAN terms: https://jra-van.jp/info/rule.html — article 7 restricts received information to personal/private use and forbids redistribution/publication without relevant agreements. Official developer guidance: https://developer.jra-van.jp/t/topic/899. Do **not** put JRA-VAN data exports in a public repo.
+- JBIS terms: https://www.jbis.or.jp/terms/ — article 8 limits use/redistribution of obtained data. **Do not** commit bulk JBIS extracts into a public repo without prior consent.
+- JRA race-card definition: https://www.jra.go.jp/JRADB/mikata/index.html — illustrates what historical fields may be available in a race-card, but current display is not proof of what was available at a historical forecast cutoff.
+
+Selected implementation: provider-neutral, manually-supplied JSON with explicit capture/source provenance. Public repository includes **synthetic test races only**, not historical bulk vendor data. A real as-of corpus and external permission/evidence are required to complete Issue #1; no backtest skill claim is made at this stage. See `docs/HISTORICAL_FEATURES.md`.
