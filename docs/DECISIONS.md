@@ -28,6 +28,12 @@ The original 2026 report weighted dry/wet 40/60. The actual day was JRA `良`. R
 
 For 2026 no.6 バステール, JRA has 16-16-16-12 at four recorded corners. A later commentary message incorrectly said 5-5-4-3. Store official rank and provenance as structured truth; do not treat comments as ground truth.
 
+## Observation O-06: Python minor versions differ in last-bit float results
+
+The initial GitHub Actions run on 2026-10-25 passed all 17 tests on Python 3.12 but failed `test_sha_source_frozen_and_reconstruct` on Python 3.10. The mismatches were at the final few binary-float digits (e.g. 0.22216305378253037 versus 0.22216305378253035). The archived report SHA256 and model-input SHA256 were already compared exactly. This is a strict-test equality defect, not evidence of a changed historical forecast.
+
+**Fix:** Preserve exact source hashes, runner numbers and names, but compare reconstructed floating marginals to the frozen snapshot with a `1e-12` absolute tolerance. Do not rewrite archived probabilities to suit an interpreter. Keep both Python versions in CI to detect genuine differences.
+
 ## Open work (not completed)
 
 1. Historical as-of per-horse feature extraction: past races only, rating, 2400m+ experience, market snapshots, weather forecast as of decision, course and rider conditions.

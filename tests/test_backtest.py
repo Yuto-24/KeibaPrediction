@@ -30,7 +30,14 @@ class TestBacktest(unittest.TestCase):
         recreated = forecast_from_legacy(self.inputs,self.forecast['race_id'],
                                          self.forecast['race_at'],self.forecast['asof'],
                                          self.forecast['origin_source'],self.forecast['original_model_sha256'])
-        self.assertEqual(recreated['runners'],self.forecast['runners'])
+        # Stable identifiers must be exact; binary float accumulation can vary
+        # by a few ULPs across supported Python versions.
+        self.assertEqual(len(recreated['runners']), len(self.forecast['runners']))
+        for actual, expected in zip(recreated['runners'], self.forecast['runners']):
+            self.assertEqual(actual['number'], expected['number'])
+            self.assertEqual(actual['name'], expected['name'])
+            for key in ('win_probability', 'top2_probability', 'top3_probability'):
+                self.assertAlmostEqual(actual[key], expected[key], delta=1e-12)
 
     def test_reproduce_original_predictions(self):
         p = model_probabilities(self.inputs)
