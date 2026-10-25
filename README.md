@@ -81,3 +81,15 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 元の独自能力点は過去データから算出した客観指標ではありません。シナリオ重みや距離補正も未校正です。現行基盤が正しく機能することと、元モデルの予測精度が高いことは別です。最終馬場などの結果を事前特徴量へ混ぜることも禁止しています。
 
 本番適用に向けた次の作業は、再現できる特徴量生成（すべて当該レース前日時基準）、十分な過去レースの予測再構築、ウォークフォワード検証、実売価格の時点記録です。まだ市場を上回る優位性を確認できていません。
+
+## Issue #1: historical as-of feature generation
+
+A provider-neutral CLI now builds per-horse features for multiple races from a supplied JSON bundle. The fixture has **3 wholly synthetic races**; it is not a backtest of historical predictions. The CLI rejects future results, late source captures, duplicate horses, target-race outcome fields, and unknown schema fields. Retrospective extracts without proven historical snapshots are disabled by default and **never** marked empirical.
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli historical-features \
+  --input data/fixtures/historical_synthetic.json \
+  --output /tmp/keiba_features.json
+```
+
+Read [historical feature schema and proof rules](docs/HISTORICAL_FEATURES.md) and [data license/source review](docs/SOURCES.md) before using real racing data. Historical real-race ingestion is intentionally **not yet complete**. Redistribution restrictions mean raw vendor extracts must not be committed here without permission. See [Issue #1](https://github.com/Yuto-24/KeibaPrediction/issues/1) for the outstanding real-data source and coverage milestone.

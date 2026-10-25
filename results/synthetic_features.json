@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "generator_version": "historical-features-v1",
+  "dataset_id": "synthetic-three-race-asof-example-v1",
+  "input_sha256": "88f04bcbe7a87d63dc9ee5549d5d31c3619170a5c0bb65fdbc69e25366b8e0f6",
+  "quality": "SYNTHETIC_NOT_EMPIRICAL",
+  "empirical_backtest_eligible": false,
+  "warning": "Synthetic tests are not empirical backtest observations",
+  "races": [
+    {
+      "race_id": "SYN-R1",
+      "race_at": "2025-05-10T15:40:00+09:00",
+      "asof": "2025-05-09T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 2400,
+      "quality": "SYNTHETIC_NOT_EMPIRICAL",
+      "runners": [
+        {
+          "number": 1,
+          "horse_id": "SYN-A",
+          "name": "Synthetic A",
+          "draw": 1,
+          "jockey_id": "SYN-J1",
+          "carried_weight_kg": 57,
+          "features": {
+            "past_starts": 1,
+            "completed_finishes": 1,
+            "wins": 1,
+            "top3_finishes": 1,
+            "starts_last_365d": 1,
+            "last_start_days_ago": 69.09722222222223,
+            "max_prior_distance_m": 2000,
+            "turf_2400m_plus_starts": 0,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": 1.0,
+            "mean_last3f_seconds": 34.8
+          },
+          "source_past_race_ids": [
+            "SYN-P1"
+          ]
+        },
+        {
+          "number": 2,
+          "horse_id": "SYN-B",
+          "name": "Synthetic B",
+          "draw": null,
+          "jockey_id": null,
+          "carried_weight_kg": null,
+          "features": {
+            "past_starts": 0,
+            "completed_finishes": 0,
+            "wins": 0,
+            "top3_finishes": 0,
+            "starts_last_365d": 0,
+            "last_start_days_ago": null,
+            "max_prior_distance_m": null,
+            "turf_2400m_plus_starts": 0,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": null,
+            "mean_last3f_seconds": null
+          },
+          "source_past_race_ids": []
+        }
+      ],
+      "excluded_entries": [
+        {
+          "number": 3,
+          "horse_id": "SYN-C",
+          "entry_status": "withdrawn"
+        }
+      ]
+    },
+    {
+      "race_id": "SYN-R2",
+      "race_at": "2025-06-14T15:40:00+09:00",
+      "asof": "2025-06-13T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 2600,
+      "quality": "SYNTHETIC_NOT_EMPIRICAL",
+      "runners": [
+        {
+          "number": 1,
+          "horse_id": "SYN-A",
+          "name": "Synthetic A",
+          "draw": null,
+          "jockey_id": null,
+          "carried_weight_kg": null,
+          "features": {
+            "past_starts": 2,
+            "completed_finishes": 2,
+            "wins": 1,
+            "top3_finishes": 2,
+            "starts_last_365d": 2,
+            "last_start_days_ago": 34.09722222222222,
+            "max_prior_distance_m": 2400,
+            "turf_2400m_plus_starts": 1,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": 0.9545454545454546,
+            "mean_last3f_seconds": 34.95
+          },
+          "source_past_race_ids": [
+            "SYN-P1",
+            "SYN-R1"
+          ]
+        },
+        {
+          "number": 2,
+          "horse_id": "SYN-D",
+          "name": "Synthetic D",
+          "draw": null,
+          "jockey_id": null,
+          "carried_weight_kg": null,
+          "features": {
+            "past_starts": 1,
+            "completed_finishes": 0,
+            "wins": 0,
+            "top3_finishes": 0,
+            "starts_last_365d": 1,
+            "last_start_days_ago": 64.09722222222223,
+            "max_prior_distance_m": 1800,
+            "turf_2400m_plus_starts": 0,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": null,
+            "mean_last3f_seconds": null
+          },
+          "source_past_race_ids": [
+            "SYN-P2"
+          ]
+        }
+      ],
+      "excluded_entries": []
+    },
+    {
+      "race_id": "SYN-R3",
+      "race_at": "2025-07-12T15:40:00+09:00",
+      "asof": "2025-07-11T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 3000,
+      "quality": "SYNTHETIC_NOT_EMPIRICAL",
+      "runners": [
+        {
+          "number": 1,
+          "horse_id": "SYN-A",
+          "name": "Synthetic A",
+          "draw": null,
+          "jockey_id": null,
+          "carried_weight_kg": null,
+          "features": {
+            "past_starts": 3,
+            "completed_finishes": 3,
+            "wins": 2,
+            "top3_finishes": 3,
+            "starts_last_365d": 3,
+            "last_start_days_ago": 27.09722222222222,
+            "max_prior_distance_m": 2600,
+            "turf_2400m_plus_starts": 2,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": 0.9696969696969697,
+            "mean_last3f_seconds": 35.1
+          },
+          "source_past_race_ids": [
+            "SYN-P1",
+            "SYN-R1",
+            "SYN-R2"
+          ]
+        },
+        {
+          "number": 2,
+          "horse_id": "SYN-D",
+          "name": "Synthetic D",
+          "draw": null,
+          "jockey_id": null,
+          "carried_weight_kg": null,
+          "features": {
+            "past_starts": 2,
+            "completed_finishes": 1,
+            "wins": 0,
+            "top3_finishes": 1,
+            "starts_last_365d": 2,
+            "last_start_days_ago": 27.09722222222222,
+            "max_prior_distance_m": 2600,
+            "turf_2400m_plus_starts": 1,
+            "first_time_target_distance_or_more": true,
+            "mean_finish_fraction": 0.8,
+            "mean_last3f_seconds": 36.0
+          },
+          "source_past_race_ids": [
+            "SYN-P2",
+            "SYN-R2"
+          ]
+        }
+      ],
+      "excluded_entries": []
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "dataset_id": "synthetic-three-race-asof-example-v1",
+  "dataset_kind": "synthetic_fixture",
+  "races": [
+    {
+      "race_id": "SYN-R1",
+      "race_at": "2025-05-10T15:40:00+09:00",
+      "asof": "2025-05-09T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 2400,
+      "snapshot": {"kind":"synthetic","observed_at":"2025-05-09T17:00:00+09:00","source_url":"synthetic://fixture/roster-1"},
+      "entries": [
+        {
+          "number": 1, "horse_id": "SYN-A", "name": "Synthetic A", "status": "declared", "draw": 1, "carried_weight_kg": 57, "jockey_id": "SYN-J1",
+          "past_starts": [
+            {"race_id":"SYN-P1","race_at":"2025-03-01T15:40:00+09:00","result_available_at":"2025-03-02T00:00:00+09:00","surface":"turf","distance_m":2000,"status":"finished","finish_position":1,"field_size":12,"last3f_seconds":34.8,"evidence":{"kind":"synthetic","observed_at":"2025-05-08T12:00:00+09:00","source_url":"synthetic://fixture/history-A-P1"}}
+          ]
+        },
+        {"number":2,"horse_id":"SYN-B","name":"Synthetic B","status":"declared","past_starts":[]},
+        {"number":3,"horse_id":"SYN-C","name":"Synthetic C","status":"withdrawn","past_starts":[]}
+      ]
+    },
+    {
+      "race_id": "SYN-R2",
+      "race_at": "2025-06-14T15:40:00+09:00",
+      "asof": "2025-06-13T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 2600,
+      "snapshot": {"kind":"synthetic","observed_at":"2025-06-13T17:00:00+09:00","source_url":"synthetic://fixture/roster-2"},
+      "entries": [
+        {"number":1,"horse_id":"SYN-A","name":"Synthetic A","status":"declared","past_starts":[
+          {"race_id":"SYN-P1","race_at":"2025-03-01T15:40:00+09:00","result_available_at":"2025-03-02T00:00:00+09:00","surface":"turf","distance_m":2000,"status":"finished","finish_position":1,"field_size":12,"last3f_seconds":34.8,"evidence":{"kind":"synthetic","observed_at":"2025-06-12T12:00:00+09:00","source_url":"synthetic://fixture/history-A-P1"}},
+          {"race_id":"SYN-R1","race_at":"2025-05-10T15:40:00+09:00","result_available_at":"2025-05-11T00:00:00+09:00","surface":"turf","distance_m":2400,"status":"finished","finish_position":2,"field_size":12,"last3f_seconds":35.1,"evidence":{"kind":"synthetic","observed_at":"2025-06-12T12:00:00+09:00","source_url":"synthetic://fixture/history-A-R1"}}
+        ]},
+        {"number":2,"horse_id":"SYN-D","name":"Synthetic D","status":"declared","past_starts":[
+          {"race_id":"SYN-P2","race_at":"2025-04-10T15:40:00+09:00","result_available_at":"2025-04-11T00:00:00+09:00","surface":"dirt","distance_m":1800,"status":"did_not_finish","finish_position":null,"field_size":10,"evidence":{"kind":"synthetic","observed_at":"2025-06-12T12:00:00+09:00","source_url":"synthetic://fixture/history-D-P2"}}
+        ]}
+      ]
+    },
+    {
+      "race_id": "SYN-R3",
+      "race_at": "2025-07-12T15:40:00+09:00",
+      "asof": "2025-07-11T18:00:00+09:00",
+      "surface": "turf",
+      "distance_m": 3000,
+      "snapshot": {"kind":"synthetic","observed_at":"2025-07-11T17:00:00+09:00","source_url":"synthetic://fixture/roster-3"},
+      "entries": [
+        {"number":1,"horse_id":"SYN-A","name":"Synthetic A","status":"declared","past_starts":[
+          {"race_id":"SYN-P1","race_at":"2025-03-01T15:40:00+09:00","result_available_at":"2025-03-02T00:00:00+09:00","surface":"turf","distance_m":2000,"status":"finished","finish_position":1,"field_size":12,"last3f_seconds":34.8,"evidence":{"kind":"synthetic","observed_at":"2025-07-10T12:00:00+09:00","source_url":"synthetic://fixture/history-A-P1"}},
+          {"race_id":"SYN-R1","race_at":"2025-05-10T15:40:00+09:00","result_available_at":"2025-05-11T00:00:00+09:00","surface":"turf","distance_m":2400,"status":"finished","finish_position":2,"field_size":12,"last3f_seconds":35.1,"evidence":{"kind":"synthetic","observed_at":"2025-07-10T12:00:00+09:00","source_url":"synthetic://fixture/history-A-R1"}},
+          {"race_id":"SYN-R2","race_at":"2025-06-14T15:40:00+09:00","result_available_at":"2025-06-15T00:00:00+09:00","surface":"turf","distance_m":2600,"status":"finished","finish_position":1,"field_size":12,"last3f_seconds":35.4,"evidence":{"kind":"synthetic","observed_at":"2025-07-10T12:00:00+09:00","source_url":"synthetic://fixture/history-A-R2"}}
+        ]},
+        {"number":2,"horse_id":"SYN-D","name":"Synthetic D","status":"declared","past_starts":[
+          {"race_id":"SYN-P2","race_at":"2025-04-10T15:40:00+09:00","result_available_at":"2025-04-11T00:00:00+09:00","surface":"dirt","distance_m":1800,"status":"did_not_finish","finish_position":null,"field_size":10,"evidence":{"kind":"synthetic","observed_at":"2025-07-10T12:00:00+09:00","source_url":"synthetic://fixture/history-D-P2"}},
+          {"race_id":"SYN-R2","race_at":"2025-06-14T15:40:00+09:00","result_available_at":"2025-06-15T00:00:00+09:00","surface":"turf","distance_m":2600,"status":"finished","finish_position":3,"field_size":11,"last3f_seconds":36.0,"dead_heat":true,"evidence":{"kind":"synthetic","observed_at":"2025-07-10T12:00:00+09:00","source_url":"synthetic://fixture/history-D-R2"}}
+        ]}
+      ]
+    }
+  ]
+}

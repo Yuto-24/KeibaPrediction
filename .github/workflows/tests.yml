@@ -18,3 +18,7 @@ jobs:
           PYTHONPATH=src python -m keiba_backtest.cli evaluate \
             --forecast data/forecasts/2026_kikka_forecast.json \
             --outcome data/outcomes/2026_kikka_result.json
+      - run: |
+          PYTHONPATH=src python -m keiba_backtest.cli historical-features \
+            --input data/fixtures/historical_synthetic.json \
+            --output /tmp/keiba_features.json

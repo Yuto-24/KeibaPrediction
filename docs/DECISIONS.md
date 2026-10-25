@@ -43,3 +43,11 @@ The initial GitHub Actions run on 2026-10-25 passed all 17 tests on Python 3.12 
 5. Robust top-2/top-3 and combination modeling, race-correlated bootstrap confidence intervals, and bet-sizing constraints.
 
 Never promote these observations into general rules without independent replication on other races.
+
+## Observation O-07: historical results are not contemporaneous data snapshots (Issue #1)
+
+2026-10-25 source-permission review found express redistribution restrictions for JRA-VAN data and JBIS extracts. Present-day official race pages also do not establish their exact historic publication/version timestamps.
+
+**Decision:** Ship a source-neutral, user-supplied as-of feature generator and synthetic multi-race contract tests before connecting a real data provider. Default refuses records retrieved only after the historical `asof`; an explicit retrospective mode produces diagnostic-only output. Do not make claims of empirical calibration or quietly use now-visible result pages as pre-race snapshots. This is an **Issue-specific observation**, not a proven pattern across independent repositories.
+
+**Still open:** obtain permitted genuine pre-race captures for several real races and build/test an adapter; do not close Issue #1 solely because synthetic tests pass.

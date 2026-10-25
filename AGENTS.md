@@ -6,3 +6,5 @@
 - Use only real, traceable source results. Mark fixtures and sensitivity calculations explicitly; do not fabricate real predictions.
 - Run `python -m unittest discover -s tests -v` after code changes.
 - Read `docs/DECISIONS.md` before changing probability models or the minimum training-race guard.
+- Historical data imports must preserve source/capture evidence and reject future data by default. Never present synthetic or retrospective-only features as independent real-world validation.
+- Review `docs/HISTORICAL_FEATURES.md` and `docs/SOURCES.md` before bringing any third-party race data into a public repository; do not republish restricted vendor extracts.
