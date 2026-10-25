@@ -93,3 +93,30 @@ PYTHONPATH=src python -m keiba_backtest.cli historical-features \
 ```
 
 Read [historical feature schema and proof rules](docs/HISTORICAL_FEATURES.md) and [data license/source review](docs/SOURCES.md) before using real racing data. Historical real-race ingestion is intentionally **not yet complete**. Redistribution restrictions mean raw vendor extracts must not be committed here without permission. See [Issue #1](https://github.com/Yuto-24/KeibaPrediction/issues/1) for the outstanding real-data source and coverage milestone.
+
+## Issue #2: record pre-race single-win odds without lookahead
+
+`capture-market` records **operator-provided** (not scraped) full-field decimal
+win odds at the current UTC clock time. It refuses backdating and post-race
+capture. The public repository includes no real vendor prices; local quote
+files are kept under Git-ignored `.local_market/`.
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli capture-market \
+  --forecast /private/forecast-upcoming.json \
+  --input /private/full-field-odds.json \
+  --output-dir .local_market
+
+PYTHONPATH=src python -m keiba_backtest.cli evaluate \
+  --forecast /private/forecast-upcoming.json \
+  --outcome /private/official-result.json \
+  --market .local_market/<race-folder>/<saved-snapshot>.json
+```
+
+A missing market file now explicitly reports `market.status=not_available`.
+The example is a command template, **not executable with the finished 2026
+Kikuka Sho as a new live observation**. Manually transcribed odds remain
+self-reported even with a checksum; source authentication, data rights,
+provider-specific integration and actual market comparison remain open.
+See [Market capture contract and limitations](docs/MARKET_SNAPSHOTS.md) and
+[Issue #2](https://github.com/Yuto-24/KeibaPrediction/issues/2).

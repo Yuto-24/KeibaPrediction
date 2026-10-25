@@ -9,6 +9,7 @@ from .scoring import score_forecast, loss
 from .temporal import walk_forward
 from .diagnostics import reliability_bins, race_bootstrap_loss_difference, summarize_walk_forward
 from .historical_features import build_from_file
+from .market_capture import capture_to_directory
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -48,8 +49,16 @@ def main(argv: list[str] | None = None) -> None:
     hist.add_argument("--input",required=True,help="Historical bundle JSON; no automatic scraping")
     hist.add_argument("--output",help="Feature JSON output")
     hist.add_argument("--allow-unverified",action="store_true",help="Retrospective sources: diagnostic only, never backtest eligible")
+    market_capture = sub.add_parser("capture-market", help="Seal a manually supplied market quote using the current system clock")
+    market_capture.add_argument("--forecast", required=True, help="Archived pre-race forecast")
+    market_capture.add_argument("--input", required=True, help="Manually transcribed full-field odds or unavailable status JSON")
+    market_capture.add_argument("--output-dir", required=True, help="Private location; never commit vendor odds")
     args=parser.parse_args(argv)
-    if args.command=="historical-features":
+    if args.command=="capture-market":
+        forecast = load_json(args.forecast)
+        saved = capture_to_directory(args.input, forecast, args.output_dir)
+        print("CAPTURED", saved)
+    elif args.command=="historical-features":
         result=build_from_file(args.input,allow_unverified=args.allow_unverified)
         _emit(result,args.output)
     elif args.command=="validate":

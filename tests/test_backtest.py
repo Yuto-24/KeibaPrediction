@@ -99,22 +99,26 @@ class TestBacktest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'exactly'):
             validate_outcome(bad_result,self.forecast)
 
-    def test_market_requires_full_field_and_is_observed_before_snapshot(self):
+    def test_market_requires_full_field_and_compatible_decision_time(self):
         quoted={"race_id":self.forecast['race_id'],
-                "observed_at":"2026-10-23T14:00:00+09:00","source_url":"https://example.org/quote",
+                "observed_at":self.forecast["asof"],"source_url":"https://example.org/quote",
                 "decimal_win_odds":{str(r['number']):10.0 for r in self.forecast['runners']}}
         expected=market_probabilities(quoted,self.forecast)
         self.assertAlmostEqual(sum(expected),1,places=12)
         self.assertAlmostEqual(expected[0],1/18,places=12)
         late=copy.deepcopy(quoted)
         late['observed_at']='2026-10-25T15:30:00+09:00'
-        with self.assertRaisesRegex(ValueError,'lookahead'):
+        with self.assertRaisesRegex(ValueError,'chronology'):
             validate_market(late,self.forecast)
+        early=copy.deepcopy(quoted)
+        early['observed_at']='2026-10-23T14:00:00+09:00'
+        with self.assertRaisesRegex(ValueError,'chronology'):
+            validate_market(early,self.forecast)
         # An explicitly later decision-time quote may be evaluated even if the
         # independent model was frozen earlier (information windows differ).
         self.assertAlmostEqual(sum(market_probabilities(
             late,self.forecast,decision_at='2026-10-25T15:35:00+09:00')),1.)
-        with self.assertRaisesRegex(ValueError,'before race start'):
+        with self.assertRaisesRegex(ValueError,'chronology'):
             validate_market(late,self.forecast,decision_at='2026-10-25T16:00:00+09:00')
         missing=copy.deepcopy(quoted)
         del missing['decimal_win_odds']['4']
@@ -172,7 +176,7 @@ class TestBacktest(unittest.TestCase):
            "runners":[{"number":1,"name":"A","win_probability":.4},
                       {"number":2,"name":"B","win_probability":.4},
                       {"number":3,"name":"C","win_probability":.2}]}
-        quote={"race_id":"R3","observed_at":"2026-10-23T11:00:00+09:00",
+        quote={"race_id":"R3","observed_at":"2026-10-23T12:00:00+09:00",
                "source_url":"https://example.org/price","decimal_win_odds":{"1":2.,"2":3.,"3":6.}}
         p=market_probabilities(quote,f)
         self.assertAlmostEqual(sum(p),1)

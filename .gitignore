@@ -3,3 +3,8 @@ __pycache__/
 *.egg-info/
 .venv/
 .pytest_cache/
+
+# Locally recorded, potentially licensed or manually transcribed odds.
+# Never publish these raw market captures without provider permission.
+.local_market/
+local_market/

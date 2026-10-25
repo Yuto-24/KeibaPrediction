@@ -16,3 +16,22 @@ The 2023–25 files contain only verified top-three result labels. They are not 
 - JRA race-card definition: https://www.jra.go.jp/JRADB/mikata/index.html — illustrates what historical fields may be available in a race-card, but current display is not proof of what was available at a historical forecast cutoff.
 
 Selected implementation: provider-neutral, manually-supplied JSON with explicit capture/source provenance. Public repository includes **synthetic test races only**, not historical bulk vendor data. A real as-of corpus and external permission/evidence are required to complete Issue #1; no backtest skill claim is made at this stage. See `docs/HISTORICAL_FEATURES.md`.
+
+## Issue #2: pre-race win odds (2026-10-26)
+
+- The code ships **no automatic market-data acquisition**. Candidate primary
+  sources include JRA's official displayed odds or an expressly licensed
+  quote feed. A provider-specific adapter and redistribution/automation
+  permissions must be reviewed before ingestion or publication.
+- JRA site terms: https://www.jra.go.jp/use/index.html . Published materials
+  and structured displays are not a blanket license to scrape/republish.
+- JRA-VAN terms: https://jra-van.jp/info/rule.html . Redistribution or
+  derivative public quote dumps should not be assumed permitted.
+- JBIS terms: https://www.jbis.or.jp/terms/ . Third-party bulk extracts are
+  not bundled with this project.
+- `capture-market` reads **manual local input only**, timestamps it at local
+  invocation, and labels resulting evidence as self-reported rather than
+  independently verified provider capture. No real odds snapshot is committed.
+- A quote's timestamp must be before the race and after the independent
+  forecast's asof. Closing dividends and retrospectively viewed odds are not
+  substituted for the decision-time prices.

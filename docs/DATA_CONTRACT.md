@@ -36,3 +36,25 @@ For comparison, `market_probabilities` normalizes `1/decimal_odds` across the fi
 ## Historical feature input / output (v1, Issue #1)
 
 See `docs/HISTORICAL_FEATURES.md` for the complete historical import contract and sample fixture. It uses its own CLI (`historical-features`), not the v0.1 `data/forecasts/` probability schema. `historical_archive` requires contemporaneous capture of full entrant rosters and prior race facts. `retrospective_research` and `synthetic_fixture` never become empirical validation samples, even when they generate plausible numerical features. Historic features must not contain target-race labels.
+
+## Market capture v1 (Issue #2; manual input and append-only snapshot)
+
+`capture-market` stamps the actual invocation time; users cannot pass an
+historical observed timestamp via this CLI. Required manual input:
+`race_id`, `source_url` (https), `status:"available"` and the complete
+`decimal_win_odds` mapping; or `status:"not_available"` plus a reason and
+no odds mapping. Unknown input keys, including post-race labels, are rejected.
+
+The resulting sealed snapshot records a provider-neutral `capture_method`,
+`observed_at == captured_at == decision_at`, `input_sha256`, `snapshot_sha256`
+and `evidence_level: SELF_REPORTED_NOT_INDEPENDENTLY_VERIFIED`. It is written
+exclusively to a new filename and must never be committed without appropriate
+licensing review. Source labels, odds contents, origin and contemporaneous
+publication are not independently authenticated by a local SHA-256 hash.
+
+For market scoring, strict comparison requires
+`forecast.asof <= observed_at <= decision_at < race_at`. The historical
+legacy market format without a seal is still accepted for diagnostic backwards
+compatibility but clearly marked `unverified_legacy_quote`. Missing market
+data yield explicit `not_available`, never fabricated probabilities. See
+`docs/MARKET_SNAPSHOTS.md` for safeguards and reproducible CLI examples.

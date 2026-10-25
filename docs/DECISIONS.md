@@ -51,3 +51,25 @@ Never promote these observations into general rules without independent replicat
 **Decision:** Ship a source-neutral, user-supplied as-of feature generator and synthetic multi-race contract tests before connecting a real data provider. Default refuses records retrieved only after the historical `asof`; an explicit retrospective mode produces diagnostic-only output. Do not make claims of empirical calibration or quietly use now-visible result pages as pre-race snapshots. This is an **Issue-specific observation**, not a proven pattern across independent repositories.
 
 **Still open:** obtain permitted genuine pre-race captures for several real races and build/test an adapter; do not close Issue #1 solely because synthetic tests pass.
+
+## Observation O-08: manual odds capture is not provider-attested (Issue #2)
+
+A historical odds sheet or today's view of a prior race does not prove the
+availability or executability of the prices at a past decision cutoff.
+The public repo lacks approval to scrape or redistribute provider odds. The
+existing market validator also accepted prices observed *before* the frozen
+forecast, conflicting with Issue #2's stricter comparison contract.
+
+**Decision:** Use a source-neutral, manually entered full-field capture adapter.
+The runtime assigns UTC `observed_at` / `captured_at` / `decision_at`, refuses
+backdating, and writes SHA-256-sealed append-only files. For simultaneous
+forecast/market comparison require `forecast.asof <= observed_at <=
+decision_at < race_at`. Missing quotes produce `not_available`, not an imputed
+baseline. Previously accepted legacy unsealed odds are labeled unverified.
+
+**Limit:** The SHA-256 seal proves internal data consistency, not the origin,
+source quotation time, a trusted capture clock, or permission to redistribute.
+An authenticated, permitted real-data adapter and independent source evidence
+are still required before claiming empirical market benchmark performance.
+This is an issue-specific observation; do not generalize the chosen method to
+all market sources without further validation.
