@@ -1,0 +1,111 @@
+{
+  "paired_races": 1,
+  "forecasts_missing_outcomes": [],
+  "results_missing_forecasts": [],
+  "summary": {
+    "race_count": 1,
+    "calibrated_test_races": 0,
+    "raw_mean_log_loss": 2.7882932653392603,
+    "uniform_mean_log_loss": 2.890371757896165,
+    "calibrated_mean_log_loss_on_eligible_races": null,
+    "raw_mean_log_loss_on_calibration_eligible_races": null,
+    "note": "When comparing calibrated vs raw, compare ONLY the common eligible races."
+  },
+  "calibration_bins": {
+    "race_count": 1,
+    "note": "Exploratory bins only. Runners within a race are dependent; do not use iid horse-level confidence intervals.",
+    "bins": [
+      {
+        "lower": 0.0,
+        "upper": 0.025,
+        "count": 8,
+        "sum_forecast_probability": 0.071025975102,
+        "observed_wins": 0,
+        "mean_forecast_probability": 0.008878246887706704,
+        "observed_win_rate": 0.0
+      },
+      {
+        "lower": 0.025,
+        "upper": 0.05,
+        "count": 5,
+        "sum_forecast_probability": 0.181952337912,
+        "observed_wins": 0,
+        "mean_forecast_probability": 0.036390467582399985,
+        "observed_win_rate": 0.0
+      },
+      {
+        "lower": 0.05,
+        "upper": 0.1,
+        "count": 2,
+        "sum_forecast_probability": 0.157254363857,
+        "observed_wins": 1,
+        "mean_forecast_probability": 0.07862718192857517,
+        "observed_win_rate": 0.5
+      },
+      {
+        "lower": 0.1,
+        "upper": 0.2,
+        "count": 2,
+        "sum_forecast_probability": 0.220482546609,
+        "observed_wins": 0,
+        "mean_forecast_probability": 0.1102412733044339,
+        "observed_win_rate": 0.0
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.35,
+        "count": 0,
+        "sum_forecast_probability": 0.0,
+        "observed_wins": 0,
+        "mean_forecast_probability": null,
+        "observed_win_rate": null
+      },
+      {
+        "lower": 0.35,
+        "upper": 0.5,
+        "count": 1,
+        "sum_forecast_probability": 0.36928477652,
+        "observed_wins": 0,
+        "mean_forecast_probability": 0.3692847765203283,
+        "observed_win_rate": 0.0
+      },
+      {
+        "lower": 0.5,
+        "upper": 1.000000001,
+        "count": 0,
+        "sum_forecast_probability": 0.0,
+        "observed_wins": 0,
+        "mean_forecast_probability": null,
+        "observed_win_rate": null
+      }
+    ]
+  },
+  "bootstrap_raw_vs_uniform": {
+    "status": "not_computed",
+    "race_count": 1,
+    "reason": "Requires at least 30 races for this initial guardrail (not a power guarantee)."
+  },
+  "walk_forward": [
+    {
+      "race_id": "JRA:2026-10-25:KYOTO:11",
+      "forecast_asof": "2026-10-23T14:47:00+09:00",
+      "raw": {
+        "log_loss": 2.7882932653392603,
+        "brier_multiclass_sum": 1.0583880261511913,
+        "winner_probability": 0.061526133138862904,
+        "top2_brier_multilabel_sum": 2.157961887982214,
+        "top3_brier_multilabel_sum": 2.656853211976398
+      },
+      "uniform": {
+        "log_loss": 2.890371757896165,
+        "brier_multiclass_sum": 0.9444444444444444,
+        "winner_probability": 0.05555555555555555,
+        "top2_brier_multilabel_sum": 1.7777777777777777,
+        "top3_brier_multilabel_sum": 2.5000000000000004
+      },
+      "n_train_races": 0,
+      "calibrated": null,
+      "calibration_skipped": "past races with pre-race forecast + settled result: 0; need at least 30. No parameter tuned."
+    }
+  ]
+}

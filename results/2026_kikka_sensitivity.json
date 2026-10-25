@@ -1,0 +1,112 @@
+{
+  "race_id": "JRA:2026-10-25:KYOTO:11",
+  "status": "HINDSIGHT_DIAGNOSTIC_NOT_TRAINING",
+  "warning": "Scenarios are evaluated after race results; no parameter is selected or recommended from this table.",
+  "variants": [
+    {
+      "temperature": 3,
+      "ground": "all",
+      "winner_probability": 0.05169352969046933,
+      "log_loss": 2.962422656354552,
+      "brier_multiclass_sum": 1.1610747423427337
+    },
+    {
+      "temperature": 3,
+      "ground": "dry",
+      "winner_probability": 0.0754064335128658,
+      "log_loss": 2.584862682503885,
+      "brier_multiclass_sum": 1.1006680684904067
+    },
+    {
+      "temperature": 3,
+      "ground": "wet",
+      "winner_probability": 0.03588492714220503,
+      "log_loss": 3.327437928415524,
+      "brier_multiclass_sum": 1.2025405249448067
+    },
+    {
+      "temperature": 3.75,
+      "ground": "all",
+      "winner_probability": 0.061526133138862904,
+      "log_loss": 2.7882932653392603,
+      "brier_multiclass_sum": 1.0583880261511913
+    },
+    {
+      "temperature": 3.75,
+      "ground": "dry",
+      "winner_probability": 0.08373759421976663,
+      "log_loss": 2.4800672479683077,
+      "brier_multiclass_sum": 1.0066769511661373
+    },
+    {
+      "temperature": 3.75,
+      "ground": "wet",
+      "winner_probability": 0.04671849241826041,
+      "log_loss": 3.0636152094275713,
+      "brier_multiclass_sum": 1.093808310051872
+    },
+    {
+      "temperature": 4.5,
+      "ground": "all",
+      "winner_probability": 0.0666672949692671,
+      "log_loss": 2.708040776607614,
+      "brier_multiclass_sum": 1.0050557628796728
+    },
+    {
+      "temperature": 4.5,
+      "ground": "dry",
+      "winner_probability": 0.08645781068564432,
+      "log_loss": 2.44809872176526,
+      "brier_multiclass_sum": 0.9612388440841365
+    },
+    {
+      "temperature": 4.5,
+      "ground": "wet",
+      "winner_probability": 0.0534736178250156,
+      "log_loss": 2.9285668714722433,
+      "brier_multiclass_sum": 1.034977789589142
+    },
+    {
+      "temperature": 6,
+      "ground": "all",
+      "winner_probability": 0.07028363781538292,
+      "log_loss": 2.6552162552586256,
+      "brier_multiclass_sum": 0.9584999554558742
+    },
+    {
+      "temperature": 6,
+      "ground": "dry",
+      "winner_probability": 0.085650762693166,
+      "log_loss": 2.4574771494861447,
+      "brier_multiclass_sum": 0.926073065888056
+    },
+    {
+      "temperature": 6,
+      "ground": "wet",
+      "winner_probability": 0.060038887896860904,
+      "log_loss": 2.8127627950922722,
+      "brier_multiclass_sum": 0.9805270991997272
+    },
+    {
+      "temperature": 8,
+      "ground": "all",
+      "winner_probability": 0.07031904736334786,
+      "log_loss": 2.654712572862112,
+      "brier_multiclass_sum": 0.9384323110273926
+    },
+    {
+      "temperature": 8,
+      "ground": "dry",
+      "winner_probability": 0.08169257618474732,
+      "log_loss": 2.504792148016574,
+      "brier_multiclass_sum": 0.9150223463898576
+    },
+    {
+      "temperature": 8,
+      "ground": "wet",
+      "winner_probability": 0.06273669481574821,
+      "log_loss": 2.7688087582615952,
+      "brier_multiclass_sum": 0.9542613786182655
+    }
+  ]
+}

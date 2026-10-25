@@ -1,0 +1,142 @@
+{
+  "race_id": "JRA:2026-10-25:KYOTO:11",
+  "race_at": "2026-10-25T15:40:00+09:00",
+  "asof": "2026-10-23T14:47:00+09:00",
+  "origin_source": "Archived pre-race report 2026-10-23, created before start (Library file created_at 2026-10-23T05:49:45Z)",
+  "original_model_sha256": "187eaa48e9c5996257a7cb005fd33e8e125de9b5ee04fecddde11fcba4648517",
+  "model_version": "2026-kikka-subjective-PL-T3.75-frozen",
+  "reconstruction_note": "Retrospectively regenerated verbatim from a pre-race archived report. Not a new ex-ante prediction.",
+  "runners": [
+    {
+      "number": 1,
+      "name": "エムズビギン",
+      "win_probability": 0.0324756026207125,
+      "top2_probability": 0.07256176830449493,
+      "top3_probability": 0.12010530797691953
+    },
+    {
+      "number": 2,
+      "name": "コンジェスタス",
+      "win_probability": 0.10340691015839434,
+      "top2_probability": 0.22216305378253035,
+      "top3_probability": 0.3479173532359337
+    },
+    {
+      "number": 3,
+      "name": "アウダーシア",
+      "win_probability": 0.04353424103070771,
+      "top2_probability": 0.09660452466664553,
+      "top3_probability": 0.1585873523371704
+    },
+    {
+      "number": 4,
+      "name": "ショウナンガルフ",
+      "win_probability": 0.0009288653006042817,
+      "top2_probability": 0.0021090195716960405,
+      "top3_probability": 0.0035639636454608717
+    },
+    {
+      "number": 5,
+      "name": "ジャスティンシカゴ",
+      "win_probability": 0.09572823071828743,
+      "top2_probability": 0.20723591076854678,
+      "top3_probability": 0.326864964043806
+    },
+    {
+      "number": 6,
+      "name": "バステール",
+      "win_probability": 0.037856578422666765,
+      "top2_probability": 0.08424156830511759,
+      "top3_probability": 0.13879725520921626
+    },
+    {
+      "number": 7,
+      "name": "ラージアンサンブル",
+      "win_probability": 0.019258889034091408,
+      "top2_probability": 0.04336015063743044,
+      "top3_probability": 0.07244705425515295
+    },
+    {
+      "number": 8,
+      "name": "ロブチェン",
+      "win_probability": 0.3692847765203283,
+      "top2_probability": 0.6202215945828092,
+      "top3_probability": 0.7833432642290072
+    },
+    {
+      "number": 9,
+      "name": "ゴーイントゥスカイ",
+      "win_probability": 0.061526133138862904,
+      "top2_probability": 0.13477631770159743,
+      "top3_probability": 0.21747850501441102
+    },
+    {
+      "number": 10,
+      "name": "ダノンヒストリー",
+      "win_probability": 0.11707563645047345,
+      "top2_probability": 0.24987908866711442,
+      "top3_probability": 0.3869780592502134
+    },
+    {
+      "number": 11,
+      "name": "アスクエジンバラ",
+      "win_probability": 0.03976883041897931,
+      "top2_probability": 0.08867195401410566,
+      "top3_probability": 0.1461109338675938
+    },
+    {
+      "number": 12,
+      "name": "サノノグレーター",
+      "win_probability": 0.005300641487595419,
+      "top2_probability": 0.011967478967880493,
+      "top3_probability": 0.020116929918482445
+    },
+    {
+      "number": 13,
+      "name": "キンググローリー",
+      "win_probability": 0.006261119654439984,
+      "top2_probability": 0.014188667816904236,
+      "top3_probability": 0.023905666535543886
+    },
+    {
+      "number": 14,
+      "name": "マジョレルブルー",
+      "win_probability": 0.019611027595915955,
+      "top2_probability": 0.04413839357441641,
+      "top3_probability": 0.07372428963131043
+    },
+    {
+      "number": 15,
+      "name": "シートゥサミット",
+      "win_probability": 0.028317085418933664,
+      "top2_probability": 0.06336899382811316,
+      "top3_probability": 0.1051221670582941
+    },
+    {
+      "number": 16,
+      "name": "ショウナンハヤナミ",
+      "win_probability": 0.006293127712579049,
+      "top2_probability": 0.014245509333016016,
+      "top3_probability": 0.023987409387775525
+    },
+    {
+      "number": 17,
+      "name": "チャリングクロス",
+      "win_probability": 0.006019237742452383,
+      "top2_probability": 0.01361555759383322,
+      "top3_probability": 0.022920935208499985
+    },
+    {
+      "number": 18,
+      "name": "ナリタエスペランサ",
+      "win_probability": 0.007353066573975152,
+      "top2_probability": 0.016650447883748296,
+      "top3_probability": 0.028028589195207027
+    }
+  ],
+  "model_inputs_sha256": "ed9c38ab101c0a1c46eed3cf2120351d88a74f659b661d5f5b2025e2b2baa879",
+  "original_report_library_path": "/2026_kikka_sho_report.md",
+  "reconstruction_date": "2026-10-25",
+  "race_name": "第87回菊花賞",
+  "model_method": "Six-scenario PL(temperature=3.75) with subjective 2026-10-23 scores"
+}

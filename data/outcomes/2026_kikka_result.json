@@ -1,0 +1,30 @@
+{
+  "race_id": "JRA:2026-10-25:KYOTO:11",
+  "status": "official_final",
+  "source_url": "https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2026.html",
+  "race_name": "第87回菊花賞",
+  "date": "2026-10-25",
+  "ground_condition": "良",
+  "result_usable_after": "2026-10-26T00:00:00+09:00",
+  "result_usable_after_note": "Conservative training eligibility boundary; NOT an asserted JRA publication timestamp.",
+  "finishing_order": [
+    9,
+    6,
+    10,
+    12,
+    15,
+    16,
+    14,
+    2,
+    3,
+    5,
+    17,
+    7,
+    1,
+    8,
+    13,
+    18,
+    11,
+    4
+  ]
+}

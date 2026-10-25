@@ -1,0 +1,53 @@
+[
+  {
+    "race_id": "JRA:2023-10-22:KYOTO:11",
+    "year": 2023,
+    "field_size": 17,
+    "top3_horse_numbers": [
+      17,
+      7,
+      14
+    ],
+    "names": [
+      "ドゥレッツァ",
+      "タスティエーラ",
+      "ソールオリエンス"
+    ],
+    "source_url": "https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2023.html",
+    "status": "labels_only_no_frozen_forecast"
+  },
+  {
+    "race_id": "JRA:2024-10-20:KYOTO:11",
+    "year": 2024,
+    "field_size": 18,
+    "top3_horse_numbers": [
+      13,
+      16,
+      17
+    ],
+    "names": [
+      "アーバンシック",
+      "ヘデントール",
+      "アドマイヤテラ"
+    ],
+    "source_url": "https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2024.html",
+    "status": "labels_only_no_frozen_forecast"
+  },
+  {
+    "race_id": "JRA:2025-10-26:KYOTO:11",
+    "year": 2025,
+    "field_size": 18,
+    "top3_horse_numbers": [
+      9,
+      15,
+      14
+    ],
+    "names": [
+      "エネルジコ",
+      "エリキング",
+      "エキサイトバイオ"
+    ],
+    "source_url": "https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2025.html",
+    "status": "labels_only_no_frozen_forecast"
+  }
+]

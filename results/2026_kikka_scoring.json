@@ -1,0 +1,20 @@
+{
+  "race_id": "JRA:2026-10-25:KYOTO:11",
+  "asof": "2026-10-23T14:47:00+09:00",
+  "n_runners": 18,
+  "winner_number": 9,
+  "model": {
+    "log_loss": 2.7882932653392603,
+    "brier_multiclass_sum": 1.0583880261511913,
+    "winner_probability": 0.061526133138862904,
+    "top2_brier_multilabel_sum": 2.157961887982214,
+    "top3_brier_multilabel_sum": 2.656853211976398
+  },
+  "uniform": {
+    "log_loss": 2.890371757896165,
+    "brier_multiclass_sum": 0.9444444444444444,
+    "winner_probability": 0.05555555555555555,
+    "top2_brier_multilabel_sum": 1.7777777777777777,
+    "top3_brier_multilabel_sum": 2.5000000000000004
+  }
+}
