@@ -73,3 +73,21 @@ An authenticated, permitted real-data adapter and independent source evidence
 are still required before claiming empirical market benchmark performance.
 This is an issue-specific observation; do not generalize the chosen method to
 all market sources without further validation.
+
+## Observation O-08: settled historical odds can benchmark prediction, not purchase EV (Issue #2)
+
+2026-10-27: Past **final** full-field win odds are available for historical
+races, but may be consulted after the race and after the model's cutoff. A
+final-market baseline therefore requires no dishonest retroactive `observed_at`;
+it **does require** clear disclosure of the later information set. Treating
+such prices as earlier executable odds is target-information leakage in a
+betting strategy simulation. Pre-race live capture remains a separate workflow.
+
+**Decision:** Use a different schema (`settled_final_win_odds`), CLI and score
+field (`market_final`) for a retrospective *forecasting* baseline. Full field,
+source, import timestamp and checksum are required; preserve market absence
+rather than impute. Neither new final-odds importer nor manually entered
+`source_url` proves provider permission or source authenticity. Never publish
+restricted raw odds in the public repository; use synthetic tests, private
+analysis and source-linked score summaries. This is a project observation,
+not general proof of model accuracy.

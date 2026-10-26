@@ -20,7 +20,7 @@ Required: `race_id`, `status:"official_final"`, `source_url`, `finishing_order`,
 
 ## Market quote (optional for `evaluate --market`)
 
-Required: `race_id`, `observed_at`, `source_url`, `decimal_win_odds`, where `decimal_win_odds` is a mapping of horse numbers as strings to decimal odds, e.g. 1.8 means a 1.8x gross payout. All runners must be present. The quote must be observed at or before the **decision cutoff**, and the decision cutoff must precede race start. By default the decision cutoff equals model `asof` (identical information cutoff). A quote collected later than model `asof` can be compared **only when `--decision-at` is explicitly supplied**, with `forecast.asof <= quote.observed_at <= decision_at < race_at`. This compares a frozen early model with a later market and is flagged as having different information windows.
+Required: `race_id`, `observed_at`, `source_url`, `decimal_win_odds`, where `decimal_win_odds` is a mapping of horse numbers as strings to decimal odds, e.g. 1.8 means a 1.8x gross payout. All runners must be present. The quote must be observed at or before the **decision cutoff**, and the decision cutoff must precede race start. For a sealed `capture-market` quote the default decision cutoff is its own `decision_at` (equal to capture time), while legacy unsealed quotes default to the model `asof`. `--decision-at` overrides this cutoff. Valid chronology is `forecast.asof <= quote.observed_at <= decision_at < race_at`. A later captured market quote is flagged as having a different information window from the earlier frozen model.
 
 A closing/settled odds sheet first retrieved after the race is not valid for an ex-ante decision-time comparison. Archived real pre-race quotes are required.
 
@@ -41,7 +41,7 @@ See `docs/HISTORICAL_FEATURES.md` for the complete historical import contract an
 
 `capture-market` stamps the actual invocation time; users cannot pass an
 historical observed timestamp via this CLI. Required manual input:
-`race_id`, `source_url` (https), `status:"available"` and the complete
+`race_id`, `source_url` (https), optional `source_label`, `status:"available"` and the complete
 `decimal_win_odds` mapping; or `status:"not_available"` plus a reason and
 no odds mapping. Unknown input keys, including post-race labels, are rejected.
 
@@ -53,8 +53,26 @@ licensing review. Source labels, odds contents, origin and contemporaneous
 publication are not independently authenticated by a local SHA-256 hash.
 
 For market scoring, strict comparison requires
-`forecast.asof <= observed_at <= decision_at < race_at`. The historical
+`forecast.asof <= observed_at <= decision_at < race_at`. A sealed snapshot
+uses its own `decision_at` unless overridden by `--decision-at`. A legacy
+unsealed quote defaults to the forecast `asof`. The historical
 legacy market format without a seal is still accepted for diagnostic backwards
 compatibility but clearly marked `unverified_legacy_quote`. Missing market
 data yield explicit `not_available`, never fabricated probabilities. See
 `docs/MARKET_SNAPSHOTS.md` for safeguards and reproducible CLI examples.
+
+## Historical settled final odds (Issue #2, retrospective benchmark only)
+
+This is **not** the pre-race market quote format. Import operator-provided
+`race_id`, HTTPS `source_url`, optional `source_label`, `status:"available"`,
+and complete `decimal_win_odds` (or `not_available` plus a reason). The CLI
+adds import-time `retrieved_at`, `odds_kind:"settled_final_win_odds"`,
+`collection_method:"retrospective_manual_import"`, provenance warning, and
+integrity digest. It never invents `observed_at` or `decision_at` before race.
+
+`evaluate-final-odds` requires a race's original immutable forecast, official
+outcome and all-runner final odds. It reports `market_final` rather than
+`market`, with a warning about unmatched information windows and
+`not_a_purchase_backtest:true`. `compare-final-odds-batch` uses only complete
+forecast/outcome/market triplets and reports data gaps. It cannot validate
+buyable price or past expected returns. See `docs/FINAL_ODDS.md`.

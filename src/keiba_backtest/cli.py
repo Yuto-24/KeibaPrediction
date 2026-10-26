@@ -10,6 +10,7 @@ from .temporal import walk_forward
 from .diagnostics import reliability_bins, race_bootstrap_loss_difference, summarize_walk_forward
 from .historical_features import build_from_file
 from .market_capture import capture_to_directory
+from .final_odds import import_final_odds, score_against_final_odds, batch_compare_final_odds
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -33,7 +34,7 @@ def main(argv: list[str] | None = None) -> None:
     eval_.add_argument("--forecast",required=True)
     eval_.add_argument("--outcome",required=True)
     eval_.add_argument("--market",help="Observed full-field odds at or before --decision-at")
-    eval_.add_argument("--decision-at",help="Trading cutoff earlier than race start; defaults to forecast asof")
+    eval_.add_argument("--decision-at",help="Pre-race trading cutoff: sealed quote decision_at, otherwise forecast asof")
     eval_.add_argument("--output")
     sens=sub.add_parser("sensitivity",help="Post-event scenario/temperature diagnostic; NOT model fitting")
     sens.add_argument("--model-inputs",required=True)
@@ -53,8 +54,32 @@ def main(argv: list[str] | None = None) -> None:
     market_capture.add_argument("--forecast", required=True, help="Archived pre-race forecast")
     market_capture.add_argument("--input", required=True, help="Manually transcribed full-field odds or unavailable status JSON")
     market_capture.add_argument("--output-dir", required=True, help="Private location; never commit vendor odds")
+    final_import = sub.add_parser("import-final-odds", help="Import historical settled win odds, strictly post-race and non-tradable")
+    final_import.add_argument("--forecast", required=True)
+    final_import.add_argument("--input", required=True, help="Manually supplied historical complete-field final odds JSON")
+    final_import.add_argument("--output-dir", required=True, help="Private storage; never commit restricted provider exports")
+    final_eval = sub.add_parser("evaluate-final-odds", help="Compare archived forecast to settled final odds, not purchase EV")
+    final_eval.add_argument("--forecast", required=True)
+    final_eval.add_argument("--outcome", required=True)
+    final_eval.add_argument("--final-odds", required=True)
+    final_eval.add_argument("--output")
+    final_batch = sub.add_parser("compare-final-odds-batch", help="Compare retrospective final market vs original model on paired races only")
+    final_batch.add_argument("--forecasts-dir", required=True)
+    final_batch.add_argument("--outcomes-dir", required=True)
+    final_batch.add_argument("--final-odds-dir", required=True)
+    final_batch.add_argument("--output")
     args=parser.parse_args(argv)
-    if args.command=="capture-market":
+    if args.command=="compare-final-odds-batch":
+        result = batch_compare_final_odds(args.forecasts_dir, args.outcomes_dir, args.final_odds_dir)
+        _emit(result, args.output)
+    elif args.command=="import-final-odds":
+        forecast = load_json(args.forecast)
+        saved = import_final_odds(args.input, forecast, args.output_dir)
+        print("IMPORTED_FINAL_ODDS", saved)
+    elif args.command=="evaluate-final-odds":
+        result = score_against_final_odds(load_json(args.forecast), load_json(args.outcome), load_json(args.final_odds))
+        _emit(result, args.output)
+    elif args.command=="capture-market":
         forecast = load_json(args.forecast)
         saved = capture_to_directory(args.input, forecast, args.output_dir)
         print("CAPTURED", saved)

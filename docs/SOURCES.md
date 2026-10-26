@@ -35,3 +35,19 @@ Selected implementation: provider-neutral, manually-supplied JSON with explicit 
 - A quote's timestamp must be before the race and after the independent
   forecast's asof. Closing dividends and retrospectively viewed odds are not
   substituted for the decision-time prices.
+
+## Final-odds retrospective benchmark (2026-10-27)
+
+- Publicly visible full-field 2026 Kikuka Sho final win prices were located on
+  netkeiba result pages, e.g. https://yoso.netkeiba.com/?id=6555938&pid=yoso_detail
+  and https://race.netkeiba.com/special/?id=0107 (limited list shown there).
+  Use the JRA official race result for winner/field confirmation:
+  https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2026.html
+- netkeiba conditions at https://www.netkeiba.com/info/kiyaku.html prohibit
+  unapproved redistribution of data beyond private use, including public bulk
+  exports. Source availability on a website does **not** grant republication
+  permission. No full-field raw vendor odds or scraped results are committed.
+- Source-provenance and dataset licensing remain analyst responsibilities;
+  the manual import pathway is **offline** and source-neutral. A complete
+  private odds file enables meaningful final-market score comparison, not
+  a bet execution backtest. Prior model snapshots are still missing for 2023–25.

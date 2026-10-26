@@ -8,3 +8,7 @@ __pycache__/
 # Never publish these raw market captures without provider permission.
 .local_market/
 local_market/
+
+# Historical settled prices used privately as a non-tradable benchmark.
+.local_final_odds/
+local_final_odds/

@@ -10,7 +10,8 @@
 - 確率校正・レース単位の信頼性集計・ブートストラップ・ウォークフォワード検証のコードを実装。
 - 事前予測が現在1レースしかないため、**学習・校正・統計的有意性評価はまだ実施できない**。最小30レースの初期ガードレールにより校正が自動スキップされる。
 - 過去年3レース（2023～2025）の**結果ラベルのみ**保存。事前予測がない以上、これらを独立モデルのバックテストに使わない。
-- 購入判断時点の実売オッズのスナップショットがなく、市場モデルとの公正な比較は**未実施**。
+- 判断時点に保存された実売オッズのスナップショットがなく、同時点での公平な市場比較は**未実施**。
+- 過去の**最終単勝オッズ**を独立した市場ベンチマークとしてインポート・採点できるようにした。これは購入時価格ではない。
 
 ## 動作確認
 
@@ -51,6 +52,8 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 | `results/` | 実際の再計算結果（JSON） |
 | `docs/DECISIONS.md` | 設計判断・確認済みの問題・次の課題 |
 | `docs/DATA_CONTRACT.md` | 新しいレースの予測・結果・市場データの入れ方 |
+| `src/keiba_backtest/final_odds.py` | 過去の最終単勝オッズを収集時刻付きで保存し、独立モデルと比較 |
+| `docs/FINAL_ODDS.md` | 過去確定オッズの利用条件・実行手順・禁止事項 |
 
 ## 2026年の採点
 
@@ -63,7 +66,7 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 
 1. 予想対象の発走前に、予想生成時刻・モデル版・全出走馬の非丸め勝率・データ取得時刻を保存。確率合計は厳密に1とする。
 2. 発走後は、対象レースの公式着順と結果が利用可能になった日時を別に記録。
-3. 市場オッズを比較する場合、**判断時点以前に実際に取得した全頭の単勝オッズ**を保存する。最終払戻から復元した価格を、購入時に知っていた価格として使用しない。
+3. **購入戦略**では判断時点以前に取得した全頭の単勝オッズが必要。**予測精度の市場比較**では後から確認した全頭の最終単勝オッズも使える。ただし最終払戻から復元した価格を、購入時に知っていた価格として使用しない。
 4. 検証レースより前に予想と結果が存在するデータのみを学習に使用する。過去30レース未満なら校正は行わない（この閾値は十分性を保証するものではない）。
 5. 係数を変更する場合は学習・モデル選択・テストを時系列で分離。2026年菊花賞の結果を使って係数を合わせた後、同レースの改善スコアを独立性能として主張しない。
 
@@ -71,7 +74,8 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 
 - `raw`: 予想当時に保存された独立モデルの確率。
 - `uniform`: 全出走馬の勝率を均等にした基準。
-- `market`: **レース前に時刻付きで保存した**全頭オッズの逆数を正規化した基準。市場の控除と偏りを完全には補正しない。モデルが先に確定していた場合、後の価格と比較するには `--decision-at` を明示し、情報時点の違いを記録する。
+- `market`: **レース前に時刻付きで保存した**全頭オッズの逆数を正規化した購入判断用の基準。封印済み観測は自身の `decision_at` を持つ。市場の控除と偏りを完全には補正しない。
+- `market_final`: **レース後に取得した確定オッズ**から作る別の予測ベンチマーク。予測と価格の利用可能な情報時点が違う。購入期待値の検証には使わない。
 - `calibrated`: 既知の過去レースだけでpower exponentを学習し、未知レースに適用した確率。
 
 `calibrated` と `raw` の比較は**同じテストレース集合**で行います。
@@ -120,3 +124,30 @@ self-reported even with a checksum; source authentication, data rights,
 provider-specific integration and actual market comparison remain open.
 See [Market capture contract and limitations](docs/MARKET_SNAPSHOTS.md) and
 [Issue #2](https://github.com/Yuto-24/KeibaPrediction/issues/2).
+
+## Issue #2: historical final odds benchmark (priority)
+
+Historical **final/settled single-win odds** are imported separately from
+`capture-market`; the new data carry `odds_kind=settled_final_win_odds` and
+an actual **post-race import** timestamp. They are NOT executable pre-race
+odds and cannot be passed to `evaluate --market`.
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli import-final-odds \
+  --forecast data/forecasts/2026_kikka_forecast.json \
+  --input /private/full-field-final-odds.json \
+  --output-dir .local_final_odds
+
+PYTHONPATH=src python -m keiba_backtest.cli evaluate-final-odds \
+  --forecast data/forecasts/2026_kikka_forecast.json \
+  --outcome data/outcomes/2026_kikka_result.json \
+  --final-odds .local_final_odds/<race-folder>/<snapshot>.json
+
+PYTHONPATH=src python -m keiba_backtest.cli compare-final-odds-batch \
+  --forecasts-dir data/forecasts --outcomes-dir data/outcomes \
+  --final-odds-dir .local_final_odds
+```
+
+The `/private` odds input above must be provided by an authorized analyst;
+no vendor odds are supplied by this public repository and no automatic scraping
+occurs. Missing data stay missing. See [retrospective market contract](docs/FINAL_ODDS.md).

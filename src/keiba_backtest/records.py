@@ -84,6 +84,8 @@ def validate_market(quote: dict[str, Any], forecast: dict[str, Any],
     available only for compatibility/testing; scoring labels them unverified.
     """
     validate_forecast(forecast)
+    if quote.get("odds_kind") == "settled_final_win_odds":
+        raise ValueError("settled final odds are not an observed pre-race market quote")
     if quote["race_id"] != forecast["race_id"]:
         raise ValueError("market race mismatch")
     start = _timestamp(forecast["race_at"])
