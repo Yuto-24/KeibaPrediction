@@ -151,3 +151,18 @@ PYTHONPATH=src python -m keiba_backtest.cli compare-final-odds-batch \
 The `/private` odds input above must be provided by an authorized analyst;
 no vendor odds are supplied by this public repository and no automatic scraping
 occurs. Missing data stay missing. See [retrospective market contract](docs/FINAL_ODDS.md).
+
+## 無料の過去最終オッズを使う（Issue #2）
+
+有料のJRA-VAN Data Lab.等を使わない、**ローカルCSV専用**のインポートを追加しました。取得候補は公開KaggleのJRA歴史データ（～2021年）。CSVはPublicのGitHubへアップロードせず、`.local_free_odds/` のローカルDBとして管理します。提供元・元サイトのデータ再配布条件と、実際に取得したCSVの列名を確認してから利用してください。
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli inspect-free-csv --input /private/odds.csv
+PYTHONPATH=src python -m keiba_backtest.cli import-free-csv \
+  --odds-csv /private/odds.csv --roster-csv /private/results.csv \
+  --mapping /private/columns.json \
+  --source-url 'https://www.kaggle.com/datasets/takamotoki/jra-horse-racing-dataset' \
+  --db .local_free_odds/market.sqlite3
+```
+
+`score-free-csv --db .local_free_odds/market.sqlite3 --import-id <ID>` で全頭突合済みのレースに限り市場単独の診断ができます。**過去の独立モデル予測がない限り、市場と独立モデルの複数レース比較は実施できません。** 実際のKaggleデータの列構造は未確認のため、データのスキーマを仮定せず列名マッピングを指定する契約です。詳細は [無償データ活用手順](docs/FREE_HISTORICAL_CSV.md) を参照してください。

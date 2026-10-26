@@ -91,3 +91,9 @@ rather than impute. Neither new final-odds importer nor manually entered
 restricted raw odds in the public repository; use synthetic tests, private
 analysis and source-linked score summaries. This is a project observation,
 not general proof of model accuracy.
+
+## Observation O-09: free historical datasets need two separate provenance checks (Issue #2, 2026-10-27)
+
+A free Kaggle archive advertised under a Creative Commons license contains JRA historical results and odds through mid-2021. Independent public descriptions attribute its original collection to netkeiba, so the dataset uploader's label **does not establish downstream republication rights**, nor that the `Odds` file has been checked for settled final status. The actual CSV columns have not yet been inspected. This remains an Issue-specific observation, not a general rule about Kaggle datasets.
+
+**Decision:** no paid JRA-VAN registration, no unauthorized scraping, no provider data in public GitHub. Implement an **offline long-format CSV adapter** with explicit user-provided column mapping, private SQLite, local source digests, full-field roster matching, and a market-only retrospective diagnostic. Reject missing prices and conflicting identities rather than filling gaps. Do not claim empirical import until actual downloaded CSV and its rights are examined. Preserve a distinct pre-race quote path for genuine betting-EV work. Independent historical model performance cannot be assessed solely from an old market CSV and race results.

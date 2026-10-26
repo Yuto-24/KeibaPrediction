@@ -28,7 +28,7 @@ class TestFinalOdds(unittest.TestCase):
     def setUpClass(cls):
         cls.forecast = load_json(ROOT / "data/forecasts/2026_kikka_forecast.json")
         cls.outcome = load_json(ROOT / "data/outcomes/2026_kikka_result.json")
-        cls.now = datetime(2026, 10, 27, 12, tzinfo=timezone.utc)
+        cls.now = datetime(2026, 10, 26, 16, tzinfo=timezone.utc)
 
     def example(self):
         return {"race_id": self.forecast["race_id"],
@@ -97,6 +97,9 @@ class TestFinalOdds(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "timezone"):
             build_final_odds_snapshot(self.example(), self.forecast,
                                       retrieved_at=datetime(2026, 10, 27))
+        with self.assertRaisesRegex(ValueError, "future"):
+            build_final_odds_snapshot(self.example(), self.forecast,
+                                      retrieved_at=datetime(2099, 1, 1, tzinfo=timezone.utc))
         snap = self.snapshot()
         snap["odds_kind"] = "observed_pre_race"
         self.reseal(snap)
@@ -122,6 +125,8 @@ class TestFinalOdds(unittest.TestCase):
             target = Path(d) / "private"
             stored = import_final_odds(src, self.forecast, target, clock=lambda: self.now)
             self.assertTrue(stored.is_file())
+            self.assertEqual(load_json(stored)["input_sha256"],
+                             hashlib.sha256(src.read_bytes()).hexdigest())
             self.assertEqual(stored.stat().st_mode & 0o777, 0o600)
             self.assertEqual(load_json(stored)["retrieved_at"], self.now.isoformat(timespec="microseconds"))
             with self.assertRaises(FileExistsError):
@@ -148,6 +153,12 @@ class TestFinalOdds(unittest.TestCase):
             (p / "odds" / "dup.json").write_text(json.dumps(snap))
             with self.assertRaisesRegex(ValueError, "duplicate"):
                 batch_compare_final_odds(p / "forecasts", p / "outcomes", p / "odds")
+            selected = batch_compare_final_odds(p / "forecasts", p / "outcomes", p / "odds",
+                                                 selection={self.forecast["race_id"]: "nested/one.json"})
+            self.assertEqual(selected["market_scored_races"], 1)
+            with self.assertRaisesRegex(ValueError, "selected odds path not found"):
+                batch_compare_final_odds(p / "forecasts", p / "outcomes", p / "odds",
+                                         selection={self.forecast["race_id"]: "missing.json"})
 
     def test_cli_parsers_and_json_output(self):
         with tempfile.TemporaryDirectory() as d:

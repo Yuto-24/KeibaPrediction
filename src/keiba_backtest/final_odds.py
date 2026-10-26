@@ -53,6 +53,8 @@ def validate_final_odds(data: dict[str, Any], forecast: dict[str, Any]) -> None:
     retrieved = _timestamp(data["retrieved_at"])
     if retrieved < _timestamp(forecast["race_at"]):
         raise ValueError("final odds cannot be collected before race start")
+    if retrieved > datetime.now(timezone.utc):
+        raise ValueError("final odds retrieved_at cannot be in the future")
     for name in ("snapshot_sha256", "input_sha256"):
         val = data.get(name)
         if not isinstance(val, str) or not _HEX_SHA.fullmatch(val):
@@ -76,7 +78,8 @@ def validate_final_odds(data: dict[str, Any], forecast: dict[str, Any]) -> None:
 
 
 def build_final_odds_snapshot(input_data: dict[str, Any], forecast: dict[str, Any],
-                              *, retrieved_at: datetime) -> dict[str, Any]:
+                              *, retrieved_at: datetime,
+                              input_sha256: str | None = None) -> dict[str, Any]:
     """Construct a retrospective quote; the timestamp is *import time*, not betting time."""
     validate_forecast(forecast)
     if not isinstance(input_data, dict) or set(input_data) - _INPUT_KEYS:
@@ -86,6 +89,11 @@ def build_final_odds_snapshot(input_data: dict[str, Any], forecast: dict[str, An
     if not isinstance(retrieved_at, datetime) or retrieved_at.tzinfo is None or retrieved_at.utcoffset() is None:
         raise ValueError("retrieved_at must be timezone-aware")
     retrieved_utc = retrieved_at.astimezone(timezone.utc).isoformat(timespec="microseconds")
+    if input_sha256 is None:
+        # Only in-memory callers without a source file use canonical JSON hashing.
+        input_sha256 = hashlib.sha256(canonical_bytes(input_data)).hexdigest()
+    if not _HEX_SHA.fullmatch(input_sha256):
+        raise ValueError("input_sha256 must be SHA-256 of original input bytes")
     output = {
         "schema_version": _VERSION,
         "odds_kind": "settled_final_win_odds",
@@ -95,7 +103,7 @@ def build_final_odds_snapshot(input_data: dict[str, Any], forecast: dict[str, An
         "collection_method": "retrospective_manual_import",
         "provenance": "MANUALLY_TRANSCRIBED_POST_RACE_NOT_SOURCE_VERIFIED",
         "status": input_data.get("status"),
-        "input_sha256": hashlib.sha256(canonical_bytes(input_data)).hexdigest(),
+        "input_sha256": input_sha256,
     }
     if "source_label" in input_data:
         output["source_label"] = input_data["source_label"]
@@ -113,8 +121,10 @@ def import_final_odds(input_file: str | Path, forecast: dict[str, Any], output_d
     """Append-only local import. No network access; no user-supplied backdated clock."""
     if clock is None:
         clock = lambda: datetime.now(timezone.utc)
-    data = json.loads(Path(input_file).read_bytes())
-    snapshot = build_final_odds_snapshot(data, forecast, retrieved_at=clock())
+    raw = Path(input_file).read_bytes()
+    data = json.loads(raw)
+    snapshot = build_final_odds_snapshot(data, forecast, retrieved_at=clock(),
+                                         input_sha256=hashlib.sha256(raw).hexdigest())
     race_id = snapshot["race_id"]
     if not _FILENAME_ID.fullmatch(race_id):
         raise ValueError("race_id is not filename-safe")
@@ -166,7 +176,8 @@ def score_against_final_odds(forecast: dict[str, Any], outcome: dict[str, Any],
 
 
 def batch_compare_final_odds(forecasts_dir: str | Path, outcomes_dir: str | Path,
-                             final_odds_dir: str | Path) -> dict[str, Any]:
+                             final_odds_dir: str | Path,
+                             *, selection: dict[str, str] | None = None) -> dict[str, Any]:
     """Batch audit: score only races with matching forecasts, outcomes and final odds.
 
     Explicitly report missing files; never fill missing final odds with the
@@ -190,7 +201,36 @@ def batch_compare_final_odds(forecasts_dir: str | Path, outcomes_dir: str | Path
 
     forecasts = read_index(forecasts_dir, "runners", recursive=False)
     outcomes = read_index(outcomes_dir, "finishing_order", recursive=False)
-    final_odds = read_index(final_odds_dir, "odds_kind", recursive=True)
+    # Retain all immutable snapshots. Select an exact relative path when more
+    # than one version exists; choosing newest implicitly would change history.
+    final_root = Path(final_odds_dir)
+    candidate_odds: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+    for path in sorted(final_root.rglob("*.json")):
+        record = load_json(path)
+        if record.get("odds_kind") != "settled_final_win_odds":
+            raise ValueError(f"{path}: missing or invalid odds_kind")
+        race_id = record.get("race_id")
+        if not isinstance(race_id, str) or not race_id:
+            raise ValueError(f"{path}: invalid race_id")
+        relative = path.relative_to(final_root).as_posix()
+        # Validate every alternate snapshot before considering it for selection.
+        if race_id in forecasts:
+            validate_final_odds(record, forecasts[race_id])
+        candidate_odds.setdefault(race_id, []).append((relative, record))
+    selection = {} if selection is None else selection
+    if set(selection) - set(candidate_odds):
+        raise ValueError("selection refers to unknown race_id")
+    final_odds: dict[str, dict[str, Any]] = {}
+    for race_id, candidates in candidate_odds.items():
+        if race_id in selection:
+            matched = [rec for path, rec in candidates if path == selection[race_id]]
+            if len(matched) != 1:
+                raise ValueError(f"{race_id}: selected odds path not found")
+            final_odds[race_id] = matched[0]
+        elif len(candidates) == 1:
+            final_odds[race_id] = candidates[0][1]
+        else:
+            raise ValueError(f"duplicate race_id {race_id}; provide --selection with exact snapshot path")
     scored = []
     unavailable = []
     for race_id in sorted(set(forecasts) & set(outcomes)):

@@ -51,3 +51,9 @@ Selected implementation: provider-neutral, manually-supplied JSON with explicit 
   the manual import pathway is **offline** and source-neutral. A complete
   private odds file enables meaningful final-market score comparison, not
   a bet execution backtest. Prior model snapshots are still missing for 2023–25.
+
+## Zero-fee historical market-data option (2026-10-27)
+
+- **Free source candidate**: [Kaggle takamotoki JRA horse racing dataset](https://www.kaggle.com/datasets/takamotoki/jra-horse-racing-dataset), public CSV odds/results/corners/laps, 1986–July 2021. Account requirements may vary; there is no paid JRA-VAN dependency.
+- **Provenance warning**: [independent dataset description](https://github.com/evanfadhil/japan_horse_racing_analysis) says the CSV data were scraped from netkeiba. A public CC BY 4.0 metadata label does *not* independently verify the provider granted redistribution; consult [netkeiba's terms](https://rsp.netkeiba.com/info/kiyaku.html). Keep bulk CSV and derived odds indexes local/private.
+- **Implementation**: only offline, user-provided local CSV input and explicit column mappings. No scraping, no presumed provider schema, no public vendor records. Coverage and scoring are considered unverified until a real CSV sample is inspected and a complete field is reconciled. Details: `docs/FREE_HISTORICAL_CSV.md`.

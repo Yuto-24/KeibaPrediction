@@ -76,3 +76,9 @@ outcome and all-runner final odds. It reports `market_final` rather than
 `not_a_purchase_backtest:true`. `compare-final-odds-batch` uses only complete
 forecast/outcome/market triplets and reports data gaps. It cannot validate
 buyable price or past expected returns. See `docs/FINAL_ODDS.md`.
+
+## Offline free historical CSV index (Issue #2)
+
+A free local CSV archive, unlike a pre-race forecast or quote, is retrospective research data. `import-free-csv` creates private `csv_imports`, `csv_win_odds`, and `csv_race_roster` SQLite tables. It stores the original odds CSV / roster CSV SHA-256, exact column-mapping SHA-256, dataset URL and import clock; it does **not** create or backdate an `observed_at` for the historical event.
+
+Each source CSV must be a **long-format** table with one `(race_id, horse_number)` per row. Mapping JSON binds the exact source headers for race ID, horse number, decimal single-win odds, and optionally official finishing position in a separate roster file. Duplicate identities fail atomically, missing prices remain missing, and race/field mismatch is excluded from scoring. `score-free-csv` requires a complete roster and a unique winner and reports market-only retrospective scores against uniform probabilities. Historic forecasts must be independently generated and time-consistent before evaluating model skill; `score-free-csv` is not a simulation of realizable bets. Consult `docs/FREE_HISTORICAL_CSV.md` for safe usage and license caveats.

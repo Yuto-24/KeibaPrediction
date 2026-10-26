@@ -11,6 +11,7 @@ from .diagnostics import reliability_bins, race_bootstrap_loss_difference, summa
 from .historical_features import build_from_file
 from .market_capture import capture_to_directory
 from .final_odds import import_final_odds, score_against_final_odds, batch_compare_final_odds
+from .free_csv import inspect_csv, import_free_csv, score_free_csv
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -68,9 +69,37 @@ def main(argv: list[str] | None = None) -> None:
     final_batch.add_argument("--outcomes-dir", required=True)
     final_batch.add_argument("--final-odds-dir", required=True)
     final_batch.add_argument("--output")
+    final_batch.add_argument("--selection", help="JSON map of race_id to exact relative sealed snapshot path when duplicates exist")
+    free_inspect = sub.add_parser("inspect-free-csv", help="Inspect private offline CSV column names without scraping")
+    free_inspect.add_argument("--input", required=True)
+    free_inspect.add_argument("--encoding", default="utf-8-sig")
+    free_import = sub.add_parser("import-free-csv", help="Import free historical CSV odds into a private, offline SQLite index")
+    free_import.add_argument("--odds-csv", required=True)
+    free_import.add_argument("--roster-csv", help="Independent result roster CSV for full-field and winner verification")
+    free_import.add_argument("--mapping", required=True, help="Exact column-name map; never guess provider schema")
+    free_import.add_argument("--source-url", required=True, help="Free dataset webpage HTTPS URL")
+    free_import.add_argument("--source-label", default="free historical CSV; provenance not independently verified")
+    free_import.add_argument("--db", default=".local_free_odds/market.sqlite3")
+    free_import.add_argument("--encoding", default="utf-8-sig")
+    free_import.add_argument("--output")
+    free_score = sub.add_parser("score-free-csv", help="Market-only retrospective scores for complete roster-matched historical CSV races")
+    free_score.add_argument("--db", default=".local_free_odds/market.sqlite3")
+    free_score.add_argument("--import-id", required=True)
+    free_score.add_argument("--output")
     args=parser.parse_args(argv)
-    if args.command=="compare-final-odds-batch":
-        result = batch_compare_final_odds(args.forecasts_dir, args.outcomes_dir, args.final_odds_dir)
+    if args.command=="inspect-free-csv":
+        _emit(inspect_csv(args.input, encoding=args.encoding), None)
+    elif args.command=="import-free-csv":
+        report=import_free_csv(odds_csv=args.odds_csv, roster_csv=args.roster_csv,
+                               db=args.db, mapping_file=args.mapping, source_url=args.source_url,
+                               source_label=args.source_label, encoding=args.encoding)
+        _emit(report, args.output)
+    elif args.command=="score-free-csv":
+        _emit(score_free_csv(db=args.db, import_id=args.import_id), args.output)
+    elif args.command=="compare-final-odds-batch":
+        selection = load_json(args.selection) if args.selection else None
+        result = batch_compare_final_odds(args.forecasts_dir, args.outcomes_dir,
+                                          args.final_odds_dir, selection=selection)
         _emit(result, args.output)
     elif args.command=="import-final-odds":
         forecast = load_json(args.forecast)
