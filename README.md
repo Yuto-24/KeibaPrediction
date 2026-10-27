@@ -166,3 +166,14 @@ PYTHONPATH=src python -m keiba_backtest.cli import-free-csv \
 ```
 
 `score-free-csv --db .local_free_odds/market.sqlite3 --import-id <ID>` で全頭突合済みのレースに限り市場単独の診断ができます。**過去の独立モデル予測がない限り、市場と独立モデルの複数レース比較は実施できません。** 実際のKaggleデータの列構造は未確認のため、データのスキーマを仮定せず列名マッピングを指定する契約です。詳細は [無償データ活用手順](docs/FREE_HISTORICAL_CSV.md) を参照してください。
+
+
+## 無料のKaggle ZIPを取得した後の検査（Issue #2）
+
+有料契約は不要です。公開データセットの配布ZIPは利用者のローカル環境に保存し、GitHubにはアップロードしません。まずZIPを展開せずにCSVのファイル名とヘッダーだけを確認できます。
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli inspect-free-archive --input /private/jra-horse-racing-dataset.zip
+```
+
+出力はファイル名、サイズ、列名に限定されます。CSVの生データ、予測対象レースの事後結果、ベンダーの大量データは公開しません。ZIPに含まれる列の意味（単勝オッズが確定価格か、レース/馬番の識別子が一致するか）を確認した後、既存の `inspect-free-csv` と `import-free-csv` を使います。ダウンロードは自動では実行しません。現在の環境からKaggleのZIP取得には成功しておらず、実CSVスキーマの検証は未完了です。
