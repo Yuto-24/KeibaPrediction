@@ -82,3 +82,14 @@ The synthetic fixture **does not measure real JRA model performance**. The priva
 - Construct leakage-controlled, date-aligned forecasts for historical races (Issue #1) then compare the same holdout set against the market-only baseline.
 - Maintain separate `capture-market` snapshots for genuinely observed pre-race prices; settled odds cannot establish attainable ticket returns (Issue #6).
 - Later years, especially after 2021, require other freely available sources or separate permitted manually reviewed extracts; do not fake currency or coverage to fill the gap.
+
+
+## 無料のKaggle ZIPを取得した後の検査（Issue #2）
+
+有料契約は不要です。公開データセットの配布ZIPは利用者のローカル環境に保存し、GitHubにはアップロードしません。まずZIPを展開せずにCSVのファイル名とヘッダーだけを確認できます。
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli inspect-free-archive --input /private/jra-horse-racing-dataset.zip
+```
+
+出力はファイル名、サイズ、列名に限定されます。CSVの生データ、予測対象レースの事後結果、ベンダーの大量データは公開しません。ZIPに含まれる列の意味（単勝オッズが確定価格か、レース/馬番の識別子が一致するか）を確認した後、既存の `inspect-free-csv` と `import-free-csv` を使います。ダウンロードは自動では実行しません。現在の環境からKaggleのZIP取得には成功しておらず、実CSVスキーマの検証は未完了です。
