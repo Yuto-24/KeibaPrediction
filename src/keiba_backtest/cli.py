@@ -12,6 +12,7 @@ from .historical_features import build_from_file
 from .market_capture import capture_to_directory
 from .final_odds import import_final_odds, score_against_final_odds, batch_compare_final_odds
 from .free_csv import inspect_csv, import_free_csv, score_free_csv
+from .kaggle_archive import inspect_archive
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -70,6 +71,9 @@ def main(argv: list[str] | None = None) -> None:
     final_batch.add_argument("--final-odds-dir", required=True)
     final_batch.add_argument("--output")
     final_batch.add_argument("--selection", help="JSON map of race_id to exact relative sealed snapshot path when duplicates exist")
+    archive_inspect = sub.add_parser("inspect-free-archive", help="Inspect CSV headers in a manually downloaded ZIP without extracting its files")
+    archive_inspect.add_argument("--input", required=True)
+    archive_inspect.add_argument("--encoding", default="utf-8-sig")
     free_inspect = sub.add_parser("inspect-free-csv", help="Inspect private offline CSV column names without scraping")
     free_inspect.add_argument("--input", required=True)
     free_inspect.add_argument("--encoding", default="utf-8-sig")
@@ -87,7 +91,9 @@ def main(argv: list[str] | None = None) -> None:
     free_score.add_argument("--import-id", required=True)
     free_score.add_argument("--output")
     args=parser.parse_args(argv)
-    if args.command=="inspect-free-csv":
+    if args.command=="inspect-free-archive":
+        _emit(inspect_archive(args.input, encoding=args.encoding), None)
+    elif args.command=="inspect-free-csv":
         _emit(inspect_csv(args.input, encoding=args.encoding), None)
     elif args.command=="import-free-csv":
         report=import_free_csv(odds_csv=args.odds_csv, roster_csv=args.roster_csv,
