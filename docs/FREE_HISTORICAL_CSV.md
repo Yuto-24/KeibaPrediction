@@ -93,3 +93,19 @@ PYTHONPATH=src python -m keiba_backtest.cli inspect-free-archive --input /privat
 ```
 
 出力はファイル名、サイズ、列名に限定されます。CSVの生データ、予測対象レースの事後結果、ベンダーの大量データは公開しません。ZIPに含まれる列の意味（単勝オッズが確定価格か、レース/馬番の識別子が一致するか）を確認した後、既存の `inspect-free-csv` と `import-free-csv` を使います。ダウンロードは自動では実行しません。現在の環境からKaggleのZIP取得には成功しておらず、実CSVスキーマの検証は未完了です。
+
+
+## Standard free acquisition via kagglehub (2026-10-31)
+
+Install the **optional free package** on a machine with Kaggle access:
+
+```bash
+python -m pip install kagglehub
+python -m keiba_backtest.cli download-free-kaggle --manifest .local_free_odds/kaggle-manifest.json
+```
+
+The command calls `kagglehub.dataset_download("takamotoki/jra-horse-racing-dataset")`, records relative filenames, file sizes, SHA-256, UTC inventory time, and a best-effort version number **only when** the resolved cache path explicitly contains `versions/<integer>`. The version is not independently verified against Kaggle metadata. A second run with the same manifest filename fails instead of overwriting provenance. If the cache layout does not reveal a version, `dataset_version=null` rather than guessing. The returned local path is private and not a redistribution artifact.
+
+After download, inspect actual CSV headers with `inspect-free-csv --input /path/to/file.csv`, then create an explicit column mapping for `import-free-csv`. **No source-specific schema mapping is claimed until the real CSV has been inspected**. Availability of a public Kaggle listing is not by itself permission to redistribute original scraped data or proof that `Odds.csv` is the settled final-win price. Keep download cache, manifest and SQLite outside GitHub.
+
+This assistant environment cannot resolve external package/download hosts; installation and a live download could not be run here. Offline tests use an injected mock `kagglehub` module, not fabricated Kaggle files.
