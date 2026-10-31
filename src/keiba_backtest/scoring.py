@@ -24,6 +24,8 @@ def market_probabilities(quote: dict[str, Any], forecast: dict[str, Any],
                          *, decision_at: str | None = None) -> list[float]:
     """Normalized inverse odds, with an explicit as-of trading decision cutoff."""
     validate_market(quote, forecast, decision_at=decision_at)
+    if quote.get("status") == "not_available":
+        raise ValueError("no market odds available for probability baseline")
     return normalize([1./quote["decimal_win_odds"][str(r["number"])] for r in forecast["runners"]])
 
 
@@ -59,12 +61,29 @@ def score_forecast(forecast: dict[str, Any], outcome: dict[str, Any],
            "n_runners": len(numbers), "winner_number": numbers[win_index],
            "model": loss(p, win_index),
            "uniform": loss(uniform_probabilities(len(numbers)), win_index)}
-    if market is not None:
-        out["market"] = loss(market_probabilities(market, forecast, decision_at=decision_at), win_index)
-        out["market"]["observed_at"] = market["observed_at"]
-        out["market"]["decision_at"] = decision_at or forecast["asof"]
-        out["market"]["forecast_asof"] = forecast["asof"]
-        out["market"]["market_has_later_information"] = _timestamp(market["observed_at"]) > _timestamp(forecast["asof"])
+    if market is None:
+        out["market"] = {"status": "not_available", "reason": "no_pre_race_full_field_snapshot"}
+    else:
+        validate_market(market, forecast, decision_at=decision_at)
+        if market.get("status") == "not_available":
+            out["market"] = {"status": "not_available", "reason": market["reason"],
+                             "observed_at": market["observed_at"],
+                             "source_url": market["source_url"]}
+        else:
+            odds = [market["decimal_win_odds"][str(n)] for n in numbers]
+            market_score = loss(market_probabilities(market, forecast,
+                                                       decision_at=decision_at), win_index)
+            market_score.update({
+                "status": "available_self_reported" if "snapshot_sha256" in market else "unverified_legacy_quote",
+                "observed_at": market["observed_at"],
+                "decision_at": decision_at or market.get("decision_at") or forecast["asof"],
+                "forecast_asof": forecast["asof"],
+                "source_url": market["source_url"],
+                "market_has_later_information": _timestamp(market["observed_at"]) > _timestamp(forecast["asof"]),
+                "implied_inverse_odds_sum": sum(1 / x for x in odds),
+                "provenance_warning": "Manually entered odds are not independently source-verified",
+            })
+            out["market"] = market_score
     for key, top_k in (("top2_probability",2),("top3_probability",3)):
         if all(key in r for r in forecast["runners"]):
             subset = set(outcome["finishing_order"][:top_k])

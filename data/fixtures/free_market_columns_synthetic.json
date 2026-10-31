@@ -1,0 +1,4 @@
+{
+  "odds": {"race_id":"Race", "number":"Horse", "odds":"単勝"},
+  "roster": {"race_id":"Race", "number":"Horse", "finish":"着順"}
+}

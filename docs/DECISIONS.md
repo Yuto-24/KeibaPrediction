@@ -51,3 +51,49 @@ Never promote these observations into general rules without independent replicat
 **Decision:** Ship a source-neutral, user-supplied as-of feature generator and synthetic multi-race contract tests before connecting a real data provider. Default refuses records retrieved only after the historical `asof`; an explicit retrospective mode produces diagnostic-only output. Do not make claims of empirical calibration or quietly use now-visible result pages as pre-race snapshots. This is an **Issue-specific observation**, not a proven pattern across independent repositories.
 
 **Still open:** obtain permitted genuine pre-race captures for several real races and build/test an adapter; do not close Issue #1 solely because synthetic tests pass.
+
+## Observation O-08: manual odds capture is not provider-attested (Issue #2)
+
+A historical odds sheet or today's view of a prior race does not prove the
+availability or executability of the prices at a past decision cutoff.
+The public repo lacks approval to scrape or redistribute provider odds. The
+existing market validator also accepted prices observed *before* the frozen
+forecast, conflicting with Issue #2's stricter comparison contract.
+
+**Decision:** Use a source-neutral, manually entered full-field capture adapter.
+The runtime assigns UTC `observed_at` / `captured_at` / `decision_at`, refuses
+backdating, and writes SHA-256-sealed append-only files. For simultaneous
+forecast/market comparison require `forecast.asof <= observed_at <=
+decision_at < race_at`. Missing quotes produce `not_available`, not an imputed
+baseline. Previously accepted legacy unsealed odds are labeled unverified.
+
+**Limit:** The SHA-256 seal proves internal data consistency, not the origin,
+source quotation time, a trusted capture clock, or permission to redistribute.
+An authenticated, permitted real-data adapter and independent source evidence
+are still required before claiming empirical market benchmark performance.
+This is an issue-specific observation; do not generalize the chosen method to
+all market sources without further validation.
+
+## Observation O-08: settled historical odds can benchmark prediction, not purchase EV (Issue #2)
+
+2026-10-27: Past **final** full-field win odds are available for historical
+races, but may be consulted after the race and after the model's cutoff. A
+final-market baseline therefore requires no dishonest retroactive `observed_at`;
+it **does require** clear disclosure of the later information set. Treating
+such prices as earlier executable odds is target-information leakage in a
+betting strategy simulation. Pre-race live capture remains a separate workflow.
+
+**Decision:** Use a different schema (`settled_final_win_odds`), CLI and score
+field (`market_final`) for a retrospective *forecasting* baseline. Full field,
+source, import timestamp and checksum are required; preserve market absence
+rather than impute. Neither new final-odds importer nor manually entered
+`source_url` proves provider permission or source authenticity. Never publish
+restricted raw odds in the public repository; use synthetic tests, private
+analysis and source-linked score summaries. This is a project observation,
+not general proof of model accuracy.
+
+## Observation O-09: free historical datasets need two separate provenance checks (Issue #2, 2026-10-27)
+
+A free Kaggle archive advertised under a Creative Commons license contains JRA historical results and odds through mid-2021. Independent public descriptions attribute its original collection to netkeiba, so the dataset uploader's label **does not establish downstream republication rights**, nor that the `Odds` file has been checked for settled final status. The actual CSV columns have not yet been inspected. This remains an Issue-specific observation, not a general rule about Kaggle datasets.
+
+**Decision:** no paid JRA-VAN registration, no unauthorized scraping, no provider data in public GitHub. Implement an **offline long-format CSV adapter** with explicit user-provided column mapping, private SQLite, local source digests, full-field roster matching, and a market-only retrospective diagnostic. Reject missing prices and conflicting identities rather than filling gaps. Do not claim empirical import until actual downloaded CSV and its rights are examined. Preserve a distinct pre-race quote path for genuine betting-EV work. Independent historical model performance cannot be assessed solely from an old market CSV and race results.

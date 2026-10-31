@@ -10,7 +10,8 @@
 - 確率校正・レース単位の信頼性集計・ブートストラップ・ウォークフォワード検証のコードを実装。
 - 事前予測が現在1レースしかないため、**学習・校正・統計的有意性評価はまだ実施できない**。最小30レースの初期ガードレールにより校正が自動スキップされる。
 - 過去年3レース（2023～2025）の**結果ラベルのみ**保存。事前予測がない以上、これらを独立モデルのバックテストに使わない。
-- 購入判断時点の実売オッズのスナップショットがなく、市場モデルとの公正な比較は**未実施**。
+- 判断時点に保存された実売オッズのスナップショットがなく、同時点での公平な市場比較は**未実施**。
+- 過去の**最終単勝オッズ**を独立した市場ベンチマークとしてインポート・採点できるようにした。これは購入時価格ではない。
 
 ## 動作確認
 
@@ -51,6 +52,8 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 | `results/` | 実際の再計算結果（JSON） |
 | `docs/DECISIONS.md` | 設計判断・確認済みの問題・次の課題 |
 | `docs/DATA_CONTRACT.md` | 新しいレースの予測・結果・市場データの入れ方 |
+| `src/keiba_backtest/final_odds.py` | 過去の最終単勝オッズを収集時刻付きで保存し、独立モデルと比較 |
+| `docs/FINAL_ODDS.md` | 過去確定オッズの利用条件・実行手順・禁止事項 |
 
 ## 2026年の採点
 
@@ -63,7 +66,7 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 
 1. 予想対象の発走前に、予想生成時刻・モデル版・全出走馬の非丸め勝率・データ取得時刻を保存。確率合計は厳密に1とする。
 2. 発走後は、対象レースの公式着順と結果が利用可能になった日時を別に記録。
-3. 市場オッズを比較する場合、**判断時点以前に実際に取得した全頭の単勝オッズ**を保存する。最終払戻から復元した価格を、購入時に知っていた価格として使用しない。
+3. **購入戦略**では判断時点以前に取得した全頭の単勝オッズが必要。**予測精度の市場比較**では後から確認した全頭の最終単勝オッズも使える。ただし最終払戻から復元した価格を、購入時に知っていた価格として使用しない。
 4. 検証レースより前に予想と結果が存在するデータのみを学習に使用する。過去30レース未満なら校正は行わない（この閾値は十分性を保証するものではない）。
 5. 係数を変更する場合は学習・モデル選択・テストを時系列で分離。2026年菊花賞の結果を使って係数を合わせた後、同レースの改善スコアを独立性能として主張しない。
 
@@ -71,7 +74,8 @@ Windows PowerShellでは各実行コマンドの先頭の `PYTHONPATH=src` の�
 
 - `raw`: 予想当時に保存された独立モデルの確率。
 - `uniform`: 全出走馬の勝率を均等にした基準。
-- `market`: **レース前に時刻付きで保存した**全頭オッズの逆数を正規化した基準。市場の控除と偏りを完全には補正しない。モデルが先に確定していた場合、後の価格と比較するには `--decision-at` を明示し、情報時点の違いを記録する。
+- `market`: **レース前に時刻付きで保存した**全頭オッズの逆数を正規化した購入判断用の基準。封印済み観測は自身の `decision_at` を持つ。市場の控除と偏りを完全には補正しない。
+- `market_final`: **レース後に取得した確定オッズ**から作る別の予測ベンチマーク。予測と価格の利用可能な情報時点が違う。購入期待値の検証には使わない。
 - `calibrated`: 既知の過去レースだけでpower exponentを学習し、未知レースに適用した確率。
 
 `calibrated` と `raw` の比較は**同じテストレース集合**で行います。
@@ -93,3 +97,83 @@ PYTHONPATH=src python -m keiba_backtest.cli historical-features \
 ```
 
 Read [historical feature schema and proof rules](docs/HISTORICAL_FEATURES.md) and [data license/source review](docs/SOURCES.md) before using real racing data. Historical real-race ingestion is intentionally **not yet complete**. Redistribution restrictions mean raw vendor extracts must not be committed here without permission. See [Issue #1](https://github.com/Yuto-24/KeibaPrediction/issues/1) for the outstanding real-data source and coverage milestone.
+
+## Issue #2: record pre-race single-win odds without lookahead
+
+`capture-market` records **operator-provided** (not scraped) full-field decimal
+win odds at the current UTC clock time. It refuses backdating and post-race
+capture. The public repository includes no real vendor prices; local quote
+files are kept under Git-ignored `.local_market/`.
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli capture-market \
+  --forecast /private/forecast-upcoming.json \
+  --input /private/full-field-odds.json \
+  --output-dir .local_market
+
+PYTHONPATH=src python -m keiba_backtest.cli evaluate \
+  --forecast /private/forecast-upcoming.json \
+  --outcome /private/official-result.json \
+  --market .local_market/<race-folder>/<saved-snapshot>.json
+```
+
+A missing market file now explicitly reports `market.status=not_available`.
+The example is a command template, **not executable with the finished 2026
+Kikuka Sho as a new live observation**. Manually transcribed odds remain
+self-reported even with a checksum; source authentication, data rights,
+provider-specific integration and actual market comparison remain open.
+See [Market capture contract and limitations](docs/MARKET_SNAPSHOTS.md) and
+[Issue #2](https://github.com/Yuto-24/KeibaPrediction/issues/2).
+
+## Issue #2: historical final odds benchmark (priority)
+
+Historical **final/settled single-win odds** are imported separately from
+`capture-market`; the new data carry `odds_kind=settled_final_win_odds` and
+an actual **post-race import** timestamp. They are NOT executable pre-race
+odds and cannot be passed to `evaluate --market`.
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli import-final-odds \
+  --forecast data/forecasts/2026_kikka_forecast.json \
+  --input /private/full-field-final-odds.json \
+  --output-dir .local_final_odds
+
+PYTHONPATH=src python -m keiba_backtest.cli evaluate-final-odds \
+  --forecast data/forecasts/2026_kikka_forecast.json \
+  --outcome data/outcomes/2026_kikka_result.json \
+  --final-odds .local_final_odds/<race-folder>/<snapshot>.json
+
+PYTHONPATH=src python -m keiba_backtest.cli compare-final-odds-batch \
+  --forecasts-dir data/forecasts --outcomes-dir data/outcomes \
+  --final-odds-dir .local_final_odds
+```
+
+The `/private` odds input above must be provided by an authorized analyst;
+no vendor odds are supplied by this public repository and no automatic scraping
+occurs. Missing data stay missing. See [retrospective market contract](docs/FINAL_ODDS.md).
+
+## 無料の過去最終オッズを使う（Issue #2）
+
+有料のJRA-VAN Data Lab.等を使わない、**ローカルCSV専用**のインポートを追加しました。取得候補は公開KaggleのJRA歴史データ（～2021年）。CSVはPublicのGitHubへアップロードせず、`.local_free_odds/` のローカルDBとして管理します。提供元・元サイトのデータ再配布条件と、実際に取得したCSVの列名を確認してから利用してください。
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli inspect-free-csv --input /private/odds.csv
+PYTHONPATH=src python -m keiba_backtest.cli import-free-csv \
+  --odds-csv /private/odds.csv --roster-csv /private/results.csv \
+  --mapping /private/columns.json \
+  --source-url 'https://www.kaggle.com/datasets/takamotoki/jra-horse-racing-dataset' \
+  --db .local_free_odds/market.sqlite3
+```
+
+`score-free-csv --db .local_free_odds/market.sqlite3 --import-id <ID>` で全頭突合済みのレースに限り市場単独の診断ができます。**過去の独立モデル予測がない限り、市場と独立モデルの複数レース比較は実施できません。** 実際のKaggleデータの列構造は未確認のため、データのスキーマを仮定せず列名マッピングを指定する契約です。詳細は [無償データ活用手順](docs/FREE_HISTORICAL_CSV.md) を参照してください。
+
+
+## 無料のKaggle ZIPを取得した後の検査（Issue #2）
+
+有料契約は不要です。公開データセットの配布ZIPは利用者のローカル環境に保存し、GitHubにはアップロードしません。まずZIPを展開せずにCSVのファイル名とヘッダーだけを確認できます。
+
+```bash
+PYTHONPATH=src python -m keiba_backtest.cli inspect-free-archive --input /private/jra-horse-racing-dataset.zip
+```
+
+出力はファイル名、サイズ、列名に限定されます。CSVの生データ、予測対象レースの事後結果、ベンダーの大量データは公開しません。ZIPに含まれる列の意味（単勝オッズが確定価格か、レース/馬番の識別子が一致するか）を確認した後、既存の `inspect-free-csv` と `import-free-csv` を使います。ダウンロードは自動では実行しません。現在の環境からKaggleのZIP取得には成功しておらず、実CSVスキーマの検証は未完了です。

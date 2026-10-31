@@ -3,3 +3,17 @@ __pycache__/
 *.egg-info/
 .venv/
 .pytest_cache/
+
+# Locally recorded, potentially licensed or manually transcribed odds.
+# Never publish these raw market captures without provider permission.
+.local_market/
+local_market/
+
+# Historical settled prices used privately as a non-tradable benchmark.
+.local_final_odds/
+local_final_odds/
+
+# Offline free-source market research. Never put third-party data in Public GitHub.
+.local_free_odds/
+local_free_odds/
+data/raw/

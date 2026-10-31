@@ -9,6 +9,11 @@ from .scoring import score_forecast, loss
 from .temporal import walk_forward
 from .diagnostics import reliability_bins, race_bootstrap_loss_difference, summarize_walk_forward
 from .historical_features import build_from_file
+from .market_capture import capture_to_directory
+from .final_odds import import_final_odds, score_against_final_odds, batch_compare_final_odds
+from .free_csv import inspect_csv, import_free_csv, score_free_csv
+from .kaggle_archive import inspect_archive
+from .kaggle_download import download_and_inventory
 
 
 def _emit(report: object, output: str | None) -> None:
@@ -32,7 +37,7 @@ def main(argv: list[str] | None = None) -> None:
     eval_.add_argument("--forecast",required=True)
     eval_.add_argument("--outcome",required=True)
     eval_.add_argument("--market",help="Observed full-field odds at or before --decision-at")
-    eval_.add_argument("--decision-at",help="Trading cutoff earlier than race start; defaults to forecast asof")
+    eval_.add_argument("--decision-at",help="Pre-race trading cutoff: sealed quote decision_at, otherwise forecast asof")
     eval_.add_argument("--output")
     sens=sub.add_parser("sensitivity",help="Post-event scenario/temperature diagnostic; NOT model fitting")
     sens.add_argument("--model-inputs",required=True)
@@ -48,8 +53,77 @@ def main(argv: list[str] | None = None) -> None:
     hist.add_argument("--input",required=True,help="Historical bundle JSON; no automatic scraping")
     hist.add_argument("--output",help="Feature JSON output")
     hist.add_argument("--allow-unverified",action="store_true",help="Retrospective sources: diagnostic only, never backtest eligible")
+    market_capture = sub.add_parser("capture-market", help="Seal a manually supplied market quote using the current system clock")
+    market_capture.add_argument("--forecast", required=True, help="Archived pre-race forecast")
+    market_capture.add_argument("--input", required=True, help="Manually transcribed full-field odds or unavailable status JSON")
+    market_capture.add_argument("--output-dir", required=True, help="Private location; never commit vendor odds")
+    final_import = sub.add_parser("import-final-odds", help="Import historical settled win odds, strictly post-race and non-tradable")
+    final_import.add_argument("--forecast", required=True)
+    final_import.add_argument("--input", required=True, help="Manually supplied historical complete-field final odds JSON")
+    final_import.add_argument("--output-dir", required=True, help="Private storage; never commit restricted provider exports")
+    final_eval = sub.add_parser("evaluate-final-odds", help="Compare archived forecast to settled final odds, not purchase EV")
+    final_eval.add_argument("--forecast", required=True)
+    final_eval.add_argument("--outcome", required=True)
+    final_eval.add_argument("--final-odds", required=True)
+    final_eval.add_argument("--output")
+    final_batch = sub.add_parser("compare-final-odds-batch", help="Compare retrospective final market vs original model on paired races only")
+    final_batch.add_argument("--forecasts-dir", required=True)
+    final_batch.add_argument("--outcomes-dir", required=True)
+    final_batch.add_argument("--final-odds-dir", required=True)
+    final_batch.add_argument("--output")
+    final_batch.add_argument("--selection", help="JSON map of race_id to exact relative sealed snapshot path when duplicates exist")
+    kaggle = sub.add_parser("download-free-kaggle", help="Obtain reviewed free dataset via kagglehub and save local SHA256 manifest")
+    kaggle.add_argument("--manifest", required=True, help="New private manifest JSON; refuses to overwrite")
+    archive_inspect = sub.add_parser("inspect-free-archive", help="Inspect CSV headers in a manually downloaded ZIP without extracting its files")
+    archive_inspect.add_argument("--input", required=True)
+    archive_inspect.add_argument("--encoding", default="utf-8-sig")
+    free_inspect = sub.add_parser("inspect-free-csv", help="Inspect private offline CSV column names without scraping")
+    free_inspect.add_argument("--input", required=True)
+    free_inspect.add_argument("--encoding", default="utf-8-sig")
+    free_import = sub.add_parser("import-free-csv", help="Import free historical CSV odds into a private, offline SQLite index")
+    free_import.add_argument("--odds-csv", required=True)
+    free_import.add_argument("--roster-csv", help="Independent result roster CSV for full-field and winner verification")
+    free_import.add_argument("--mapping", required=True, help="Exact column-name map; never guess provider schema")
+    free_import.add_argument("--source-url", required=True, help="Free dataset webpage HTTPS URL")
+    free_import.add_argument("--source-label", default="free historical CSV; provenance not independently verified")
+    free_import.add_argument("--db", default=".local_free_odds/market.sqlite3")
+    free_import.add_argument("--encoding", default="utf-8-sig")
+    free_import.add_argument("--output")
+    free_score = sub.add_parser("score-free-csv", help="Market-only retrospective scores for complete roster-matched historical CSV races")
+    free_score.add_argument("--db", default=".local_free_odds/market.sqlite3")
+    free_score.add_argument("--import-id", required=True)
+    free_score.add_argument("--output")
     args=parser.parse_args(argv)
-    if args.command=="historical-features":
+    if args.command=="download-free-kaggle":
+        _emit(download_and_inventory(output=args.manifest), None)
+    elif args.command=="inspect-free-archive":
+        _emit(inspect_archive(args.input, encoding=args.encoding), None)
+    elif args.command=="inspect-free-csv":
+        _emit(inspect_csv(args.input, encoding=args.encoding), None)
+    elif args.command=="import-free-csv":
+        report=import_free_csv(odds_csv=args.odds_csv, roster_csv=args.roster_csv,
+                               db=args.db, mapping_file=args.mapping, source_url=args.source_url,
+                               source_label=args.source_label, encoding=args.encoding)
+        _emit(report, args.output)
+    elif args.command=="score-free-csv":
+        _emit(score_free_csv(db=args.db, import_id=args.import_id), args.output)
+    elif args.command=="compare-final-odds-batch":
+        selection = load_json(args.selection) if args.selection else None
+        result = batch_compare_final_odds(args.forecasts_dir, args.outcomes_dir,
+                                          args.final_odds_dir, selection=selection)
+        _emit(result, args.output)
+    elif args.command=="import-final-odds":
+        forecast = load_json(args.forecast)
+        saved = import_final_odds(args.input, forecast, args.output_dir)
+        print("IMPORTED_FINAL_ODDS", saved)
+    elif args.command=="evaluate-final-odds":
+        result = score_against_final_odds(load_json(args.forecast), load_json(args.outcome), load_json(args.final_odds))
+        _emit(result, args.output)
+    elif args.command=="capture-market":
+        forecast = load_json(args.forecast)
+        saved = capture_to_directory(args.input, forecast, args.output_dir)
+        print("CAPTURED", saved)
+    elif args.command=="historical-features":
         result=build_from_file(args.input,allow_unverified=args.allow_unverified)
         _emit(result,args.output)
     elif args.command=="validate":

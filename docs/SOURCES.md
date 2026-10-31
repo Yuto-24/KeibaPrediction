@@ -16,3 +16,44 @@ The 2023–25 files contain only verified top-three result labels. They are not 
 - JRA race-card definition: https://www.jra.go.jp/JRADB/mikata/index.html — illustrates what historical fields may be available in a race-card, but current display is not proof of what was available at a historical forecast cutoff.
 
 Selected implementation: provider-neutral, manually-supplied JSON with explicit capture/source provenance. Public repository includes **synthetic test races only**, not historical bulk vendor data. A real as-of corpus and external permission/evidence are required to complete Issue #1; no backtest skill claim is made at this stage. See `docs/HISTORICAL_FEATURES.md`.
+
+## Issue #2: pre-race win odds (2026-10-26)
+
+- The code ships **no automatic market-data acquisition**. Candidate primary
+  sources include JRA's official displayed odds or an expressly licensed
+  quote feed. A provider-specific adapter and redistribution/automation
+  permissions must be reviewed before ingestion or publication.
+- JRA site terms: https://www.jra.go.jp/use/index.html . Published materials
+  and structured displays are not a blanket license to scrape/republish.
+- JRA-VAN terms: https://jra-van.jp/info/rule.html . Redistribution or
+  derivative public quote dumps should not be assumed permitted.
+- JBIS terms: https://www.jbis.or.jp/terms/ . Third-party bulk extracts are
+  not bundled with this project.
+- `capture-market` reads **manual local input only**, timestamps it at local
+  invocation, and labels resulting evidence as self-reported rather than
+  independently verified provider capture. No real odds snapshot is committed.
+- A quote's timestamp must be before the race and after the independent
+  forecast's asof. Closing dividends and retrospectively viewed odds are not
+  substituted for the decision-time prices.
+
+## Final-odds retrospective benchmark (2026-10-27)
+
+- Publicly visible full-field 2026 Kikuka Sho final win prices were located on
+  netkeiba result pages, e.g. https://yoso.netkeiba.com/?id=6555938&pid=yoso_detail
+  and https://race.netkeiba.com/special/?id=0107 (limited list shown there).
+  Use the JRA official race result for winner/field confirmation:
+  https://www.jra.go.jp/datafile/seiseki/g1/kikka/result/kikka2026.html
+- netkeiba conditions at https://www.netkeiba.com/info/kiyaku.html prohibit
+  unapproved redistribution of data beyond private use, including public bulk
+  exports. Source availability on a website does **not** grant republication
+  permission. No full-field raw vendor odds or scraped results are committed.
+- Source-provenance and dataset licensing remain analyst responsibilities;
+  the manual import pathway is **offline** and source-neutral. A complete
+  private odds file enables meaningful final-market score comparison, not
+  a bet execution backtest. Prior model snapshots are still missing for 2023–25.
+
+## Zero-fee historical market-data option (2026-10-27)
+
+- **Free source candidate**: [Kaggle takamotoki JRA horse racing dataset](https://www.kaggle.com/datasets/takamotoki/jra-horse-racing-dataset), public CSV odds/results/corners/laps, 1986–July 2021. Account requirements may vary; there is no paid JRA-VAN dependency.
+- **Provenance warning**: [independent dataset description](https://github.com/evanfadhil/japan_horse_racing_analysis) says the CSV data were scraped from netkeiba. A public CC BY 4.0 metadata label does *not* independently verify the provider granted redistribution; consult [netkeiba's terms](https://rsp.netkeiba.com/info/kiyaku.html). Keep bulk CSV and derived odds indexes local/private.
+- **Implementation**: only offline, user-provided local CSV input and explicit column mappings. No scraping, no presumed provider schema, no public vendor records. Coverage and scoring are considered unverified until a real CSV sample is inspected and a complete field is reconciled. Details: `docs/FREE_HISTORICAL_CSV.md`.

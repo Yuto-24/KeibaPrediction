@@ -78,20 +78,48 @@ def validate_outcome(outcome: dict[str, Any], forecast: dict[str, Any]) -> None:
 
 def validate_market(quote: dict[str, Any], forecast: dict[str, Any],
                     *, decision_at: str | None = None) -> None:
+    """Check chronological validity and complete, non-corrupted odds.
+
+    Sealed snapshots have their own decision time. Legacy unsealed quotes remain
+    available only for compatibility/testing; scoring labels them unverified.
+    """
     validate_forecast(forecast)
+    if quote.get("odds_kind") == "settled_final_win_odds":
+        raise ValueError("settled final odds are not an observed pre-race market quote")
     if quote["race_id"] != forecast["race_id"]:
         raise ValueError("market race mismatch")
-    cutoff = _timestamp(decision_at or forecast["asof"])
-    if cutoff >= _timestamp(forecast["race_at"]):
-        raise ValueError("decision cutoff must be before race start")
-    if _timestamp(forecast["asof"]) > cutoff:
-        raise ValueError("forecast was not available at decision cutoff")
-    # Caller must explicitly request a decision later than the archived forecast.
-    if _timestamp(quote["observed_at"]) > cutoff:
-        raise ValueError("market quote after decision cutoff (lookahead)")
-    if not quote.get("source_url"):
+    start = _timestamp(forecast["race_at"])
+    forecast_at = _timestamp(forecast["asof"])
+    cutoff = _timestamp(decision_at or quote.get("decision_at") or forecast["asof"])
+    observed = _timestamp(quote["observed_at"])
+    if not (forecast_at <= observed <= cutoff < start):
+        raise ValueError("market chronology violation: forecast.asof <= observed_at <= decision_at < race_at required")
+    if not isinstance(quote.get("source_url"), str) or not quote["source_url"]:
         raise ValueError("market source URL missing")
+    if "schema_version" in quote or "snapshot_sha256" in quote:
+        from .market_capture import verify_seal
+        if quote.get("schema_version") != 1 or quote.get("capture_method") != "manual_transcription":
+            raise ValueError("unsupported sealed market snapshot")
+        if quote.get("evidence_level") != "SELF_REPORTED_NOT_INDEPENDENTLY_VERIFIED":
+            raise ValueError("invalid market provenance classification")
+        if not isinstance(quote.get("input_sha256"), str) or len(quote["input_sha256"]) != 64:
+            raise ValueError("invalid market input digest")
+        if _timestamp(quote["captured_at"]) != observed:
+            raise ValueError("sealed snapshot captured_at must match observed_at")
+        sealed_decision = _timestamp(quote["decision_at"])
+        if sealed_decision != observed:
+            raise ValueError("sealed snapshot decision_at must equal capture time")
+        verify_seal(quote)
+    status = quote.get("status", "available")
+    if status == "not_available":
+        if "decimal_win_odds" in quote or not quote.get("reason"):
+            raise ValueError("not_available must have a reason and no odds")
+        return
+    if status != "available":
+        raise ValueError("invalid market status")
     values = quote["decimal_win_odds"]
+    if not isinstance(values, dict):
+        raise ValueError("decimal_win_odds must be a mapping")
     expected = {str(r["number"]) for r in forecast["runners"]}
     if set(values) != expected:
         raise ValueError("missing/unknown market odds for runners")
